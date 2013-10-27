@@ -4,23 +4,34 @@ function $WidgetsDirective($templateCache) {
         template: $templateCache.get('widgets.html'),
         replace: true,
         restrict: 'EA',
+        scope: true,
         link: function($scope, iElement, iAttrs) {
-            console.log('widgets');
+            console.log('widgets directive link');
             var options = $scope.$eval(iAttrs.ngWidgets);
-            var defaults = angular.extend({
+            if (!options) return;
+
+            var defaults = extend({
                 width: 250,
-                height: 210
+                height: 180
             }, options.defaults || {});
-            delete options.defaults;
 
-            var items = [];
-            angular.forEach(options.items || [], function (item) {
-                items.push(angular.extend({}, defaults, item));
-            }, items);
-            delete options.items;
-            $scope.items = items;
+            if (typeof options.widgets === 'string') {
+                $scope.$parent.$watch(options.widgets, function (widgets) {
+                    console.log('widgets changed', widgets);
+                    update(widgets);
+                });
+            } else {
+                update(options.widgets);
+            }
 
-            angular.extend($scope, options);
+            function update(widgets) {
+                console.log('update widgets', widgets);
+                var _widgets = [];
+                angular.forEach(widgets || [], function (widget) {
+                    _widgets.push(merge(widget, defaults));
+                });
+                $scope.widgets = _widgets;
+            }
         }
     };
 }

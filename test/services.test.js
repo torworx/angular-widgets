@@ -71,7 +71,7 @@ describe('services', function () {
             expect(widget.view).toBeUndefined();
             expect(widget.style).toBeUndefined();
 
-            promise = widget.loadRes();
+            promise = widget.loadResources();
             expect(promise).toBeTruthy();
             $httpBackend.flush();
 

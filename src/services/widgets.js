@@ -1,6 +1,6 @@
 function $WidgetsProvider() {
 
-    var loadQueue = [],
+    var queue = [],
         definitions = [];
 
     function declare(statics) {
@@ -23,7 +23,6 @@ function $WidgetsProvider() {
         constructor.prototype = angular.extend(new Widget(), {
             constructor: constructor
         });
-        definitions.push(constructor);
         return constructor;
     }
 
@@ -40,7 +39,7 @@ function $WidgetsProvider() {
 
         var constructor = declare(statics);
         extend(constructor.prototype, prototype);
-        return constructor;
+        queue.push({clazz: constructor});
     }
 
     this.load = function (statics, url) {
@@ -54,19 +53,16 @@ function $WidgetsProvider() {
         }
 
         var constructor = declare(statics);
-        loadQueue.push({
-            clazz: constructor,
-            url: url
-        })
+        queue.push({ clazz: constructor, url: url });
     };
 
-    function Loader($http, $q) {
+    function WidgetLoader($http, $q) {
         return {
             load: function load(clazz, url) {
                 var d = $q.defer();
                 $http.get(url + '/widget.js')
                     .success(function (data) {
-                        console.log('loaded widget', data);
+                        console.log('loaded widget: ' + url);
                         var fn = new Function('define', data);
                         fn(function (prototype) {
                             extend(clazz.prototype, prototype);
@@ -74,18 +70,19 @@ function $WidgetsProvider() {
                             clazz.prototype.location = url;
                             return clazz;
                         });
-                        d.resolve();
+                        d.resolve(clazz);
                     })
                     .error(function (err) {
-                        console.error('load widget error', err);
-                        d.reject("Could not load widget: " + url);
+                        console.err("Could not load widget: " + url);
+                        d.resolve();
+//                        d.reject("Could not load widget: " + url);
                     });
                 return d.promise;
             }
         }
     }
 
-    function loadResFn(resources, $q) {
+    function loadResourcesFn(resources, $q) {
         return function () {
             var self = this;
             if (!self._resready) {
@@ -104,11 +101,14 @@ function $WidgetsProvider() {
     }
 
     function flush($http, $q) {
-        console.log('flushing ' + loadQueue.length);
-        var loader = Loader($http, $q);
+        var loader = WidgetLoader($http, $q);
         var promises = [];
-        forEach(loadQueue, function (item) {
-            promises.push(loader.load(item.clazz, item.url));
+        forEach(queue, function (item) {
+            if (item.url) {
+                promises.push(loader.load(item.clazz, item.url));
+            } else {
+                promises.push($q.when(item.clazz));
+            }
         });
         return $q.all(promises);
     }
@@ -117,19 +117,22 @@ function $WidgetsProvider() {
     $get.$inject = ['$http', '$q'];
     function $get($http, $q) {
         var resources = new Resources($http, $q);
-        var loadRes = loadResFn(resources, $q);
+        var loadResources = loadResourcesFn(resources, $q);
 
-        forEach(definitions, function (clazz) {
-            clazz.prototype.loadRes = loadRes;
+        var promise = flush($http, $q).then(function (results) {
+            forEach(results, function (clazz) {
+                if (!clazz) return;
+                clazz.prototype.loadResources = loadResources;
+                definitions.push(clazz);
+            });
+        }, function (reason) {
+            console.err('widgets load failed: ' + reason);
         });
-
-        var promise = flush($http, $q);
 
         return {
             ready: promise,
             definitions: definitions
         }
-
     }
 }
 

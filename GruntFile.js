@@ -134,7 +134,7 @@ module.exports = function (grunt) {
             },
             // Auto-build angular-widgets.debug.js when source files change
             debug: {
-                files: ['<%= srcFiles %>'],
+                files: ['<%= srcFiles %>', '<%= ngtemplates.widgets.src %>'],
                 tasks: ['debug']
             },
             less: {
