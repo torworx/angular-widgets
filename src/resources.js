@@ -1,5 +1,7 @@
 function Resources($q, $http) {
+
     var assetsCompiler = new AssetsCompiler();
+    var debugResources = debug('ngw:resources');
 
     /**
      *
@@ -23,7 +25,7 @@ function Resources($q, $http) {
             var i = dataUrl.lastIndexOf('.');
             var extension = i < 0 ? '' : dataUrl.substring(i + 1);
             d = $q.defer();
-            console.log('loading resource "' + prop + '" from ' + dataUrl);
+            debugResources('loading resource "' + prop + '" from ' + dataUrl);
             $http.get(dataUrl).then(function (result) {
                 var source = intercept ? intercept(extension, result.data) : result.data;
                 if (assetsCompiler.hasCompiler(extension)) {
@@ -38,7 +40,7 @@ function Resources($q, $http) {
             p = d.promise;
         }
         return p ? p.then(function (data) {
-            console.log('loaded resource "' + prop + '" from ' + dataUrl);
+            debugResources('loaded resource "' + prop + '" from ' + dataUrl);
             return object[prop] = data;
         }) : $q.when();
     };

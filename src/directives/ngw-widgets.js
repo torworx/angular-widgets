@@ -7,7 +7,7 @@ function $WidgetsDirective($templateCache) {
         scope: true,
         link: function($scope, iElement, iAttrs) {
             console.log('widgets directive link');
-            var options = $scope.$eval(iAttrs.ngWidgets);
+            var options = $scope.$eval(iAttrs.ngwWidgets);
             if (!options) return;
 
             var defaults = extend({
@@ -34,4 +34,4 @@ function $WidgetsDirective($templateCache) {
     };
 }
 
-angular.module('widgets.directives').directive('ngWidgets', $WidgetsDirective);
+angular.module('widgets.directives').directive('ngwWidgets', $WidgetsDirective);

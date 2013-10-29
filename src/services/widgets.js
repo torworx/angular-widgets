@@ -1,5 +1,6 @@
 function $WidgetsProvider() {
 
+    var debugWidgets = debug('ngw:widgets-service');
     var queue = [],
         definitions = [];
 
@@ -53,7 +54,7 @@ function $WidgetsProvider() {
             var d = $q.defer();
             $http.get(url + '/widget.js')
                 .success(function (data) {
-                    console.log('loaded widget: ' + url);
+                    debugWidgets('loaded widget: ' + url);
                     var fn = new Function('define', data);
                     fn(function (data) {
                         WidgetClass = declare(statics, data);

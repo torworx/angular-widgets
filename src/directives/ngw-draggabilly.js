@@ -1,7 +1,7 @@
 $DraggabillyDirective.$inject = ['$rootScope'];
 function $DraggabillyDirective($rootScope) {
 
-    var debugDrag = debug("widgets:draggabilly");
+    var debugDrag = debug("ngw:draggabilly");
 
     return {
         restrict: 'A',
@@ -15,8 +15,8 @@ function $DraggabillyDirective($rootScope) {
                 });
 
                 draggie.on('dragEnd', function(draggieInstance, event, pointer) {
+                    debugDrag('drag end');
                 });
-
             };
 
 
@@ -26,20 +26,20 @@ function $DraggabillyDirective($rootScope) {
                 match: function() {
                     // SETUP PACKERY
                     draggie.enable();
-                    debugDrag("Matched");
+                    debugDrag("matched");
                 },
 
                 unmatch: function() {
                     // DISABLE PACKERY
                     draggie.disable();
-                    debugDrag("Unmatched");
+                    debugDrag("unmatched");
                 },
 
                 deferSetup: false,
 
                 setup: function() {
                     dragInit();
-                    debugDrag("Setup");
+                    debugDrag("setup");
                     if (!enquire.queries[mediaQuery].mql.matches) {
                         draggie.disable();
                     }
@@ -47,20 +47,17 @@ function $DraggabillyDirective($rootScope) {
 
             });
 
+            $rootScope.$broadcast(':draggabilly', draggie);
 
-            $rootScope.$broadcast('!draggabilly', draggie);
-
-            $rootScope.$on('!undraggable', function() {
+            $rootScope.$on(':undraggable', function() {
                 draggie.disable();
             });
 
-            $rootScope.$on('!draggable', function() {
+            $rootScope.$on(':draggable', function() {
                 draggie.enable();
             })
-
-
         }
     }
 }
 
-angular.module('widgets.directives').directive('ngDraggabilly', $DraggabillyDirective);
+angular.module('widgets.directives').directive('ngwDraggabilly', $DraggabillyDirective);

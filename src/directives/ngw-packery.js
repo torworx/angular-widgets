@@ -1,9 +1,9 @@
 $PackeryDirective.$inject = ['$rootScope', '$timeout'];
 function $PackeryDirective($rootScope, $timeout) {
 
-    var packery, packeryLoaded;
+    var packery;
 
-    var debugPackery = debug("widgets:packery");
+    var debugPackery = debug("ngw:packery");
     return {
         restrict: 'A',
         link: function postLink($scope, element, attrs) {
@@ -11,23 +11,58 @@ function $PackeryDirective($rootScope, $timeout) {
                 debugPackery('init');
 
                 packery = new Packery(element[0], {
-                    itemSelector: attrs.ngPackery,
+                    itemSelector: attrs.ngwPackery,
                     columnWidth: 250,
                     rowHeight: 210,
                     gutter: 20,
                     isInitLayout: false
                 });
+
+                // LAYOUT COMPLETE
+                packery.on('layoutComplete', function(packery, items) {
+                    // debugPackery("Packery Layout Complete", packery, items);
+                });
+
+                packery.on('dragItemPositioned', function(packery, draggedItem) {
+                    debugPackery("widgets order changed");
+
+                    if (!$scope.$$phase) {
+                        $scope.$apply(function() {
+
+                            var newItems = packery.items;
+                            var ids = [];
+                            forEach(newItems, function (item) {
+                                ids.push(item.element.id);
+                            });
+
+                            $rootScope.$broadcast(':widgetsReordered', ids);
+
+
+//                            var widgetIds = _.map(newItems, function(item) { return item.element.id; });
+//
+//                            _.each(widgetIds, function(id, index) {
+//                                var widget = _.find(NBUser.DashboardSettings.Widgets, function(widget) { return widget.id === id; });
+//                                widget.settings.sortOrder = index;
+//                            });
+
+                            // Update the Dashboard Widgets sort order
+//                            NBUser.DashboardSettings.Widgets = _.sortBy(NBUser.DashboardSettings.Widgets, function(widget) { return widget.settings.sortOrder; });
+//                            NBUser.SavePreferences();
+
+                        });
+                    }
+
+                    $rootScope.$broadcast(':widgetsOrderUpdated', draggedItem);
+                })
             }
 
             function packeryRefresh() {
                 if (packery) {
-                    debugPackery("Refreshing");
+                    debugPackery("refreshing");
                     packery.reloadItems();
                     packery.layout();
 
-                    debugPackery(element.find(attrs.ngPackery).length);
-
-                    element.find(attrs.ngPackery).css({
+                    element.find(attrs.ngwPackery).css({
                         opacity: 1
                     });
                 }
@@ -36,21 +71,20 @@ function $PackeryDirective($rootScope, $timeout) {
             function packeryRelease() {
 
                 if (packery && packery.destroy) {
-                    debugPackery("Destroy");
+                    debugPackery("destroy");
                     packery.destroy();
-//                    packery = null;
                 }
                 packery = null;
 
                 // Reset element CSS
-                element.find(attrs.ngPackery).css({
+                element.find(attrs.ngwPackery).css({
                     top: 'auto', left: 'auto', position: 'relative', opacity: 1
                 });
             }
 
             function forceShowItems() {
                 $timeout(function() {
-                    element.find(attrs.ngPackery).css({
+                    element.find(attrs.ngwPackery).css({
                         opacity: 1
                     });
                 }, 0)
@@ -65,7 +99,7 @@ function $PackeryDirective($rootScope, $timeout) {
                     // SETUP PACKERY
                     packeryInit();
                     packeryRefresh();
-                    $rootScope.$broadcast("!draggable");
+                    $rootScope.$broadcast(":draggable");
                 },
 
                 unmatch: function() {
@@ -73,11 +107,11 @@ function $PackeryDirective($rootScope, $timeout) {
                         // DISABLE PACKERY
                         packeryRelease();
                         // forceShowItems();
-                        debugPackery("Unmatched");
+                        debugPackery("unmatched");
                         element.find(attrs.packery).css({
                             top: '', left: '', position: '', opacity: 1
                         });
-                        $rootScope.$broadcast("!undraggable");
+                        $rootScope.$broadcast(":undraggable");
                     }, 100)
                 },
 
@@ -85,17 +119,17 @@ function $PackeryDirective($rootScope, $timeout) {
 
                 setup: function() {
 
-                    debugPackery("Setup");
+                    debugPackery("setup");
                     if (enquire.queries[mediaQuery].mql.matches) {
                         packeryInit();
                     } else {
                         forceShowItems();
-                        $rootScope.$broadcast("!undraggable");
+                        $rootScope.$broadcast(":undraggable");
                     }
                 }
             });
 
-            $rootScope.$on("!widgetsLoaded", function(event, widgets) {
+            $rootScope.$on(":widgetsLoaded", function(event, widgets) {
                 if (enquire.queries[mediaQuery].mql.matches) {
                     packeryRefresh();
                 } else {
@@ -104,23 +138,23 @@ function $PackeryDirective($rootScope, $timeout) {
 
             });
 
-            $rootScope.$on("!draggabilly", function(event, draggie) {
+            $rootScope.$on(":draggabilly", function(event, draggie) {
                 if (packery) {
                     packery.bindDraggabillyEvents(draggie);
                 }
             });
 
-            $rootScope.$on("!doLayout", function(event) {
+            $rootScope.$on(":doLayout", function(event) {
                 $timeout(function() {
                     packeryRefresh();
                 }, 500)
             });
 
-            $rootScope.$on("!packeryDestory", function(event) {
+            $rootScope.$on(":packeryDestroy", function(event) {
                 packeryRelease();
             });
         }
     }
 }
 
-angular.module('widgets.directives').directive('ngPackery', $PackeryDirective);
+angular.module('widgets.directives').directive('ngwPackery', $PackeryDirective);
