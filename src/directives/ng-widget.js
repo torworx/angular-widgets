@@ -5,11 +5,11 @@ function $WidgetDirective($templateCache, $sce, $timeout) {
         template: $templateCache.get('widget.html'),
         replace: true,
         restrict: 'EA',
-        link: function($scope, iElement) {
+        link: function($scope, element) {
 
-            var $el = $(iElement);
+            var $el = $(element);
             var widget = $scope.widget;
-            var $elView = iElement.find('.view');
+            var $elBody = element.find('.x-body');
 
             $scope.title = widget.name;
             $scope.view = $sce.trustAsHtml(widget.view);
@@ -18,11 +18,13 @@ function $WidgetDirective($templateCache, $sce, $timeout) {
             $el.attr('id', widget.id);
 
             $el.width(widget.width);
-            $elView.height(widget.height);
-
+            $el.height(widget.height);
+            if (widget.bodyCls) {
+                $elBody.addClass(widget.bodyCls);
+            }
 
             $timeout(function () {
-                widget.widgetize($scope, $elView);
+                widget._initialize($scope, $elBody);
             });
         }
     };

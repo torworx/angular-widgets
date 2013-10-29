@@ -12,12 +12,11 @@ function $WidgetsDirective($templateCache) {
 
             var defaults = extend({
                 width: 250,
-                height: 180
+                height: 210
             }, options.defaults || {});
 
             if (typeof options.widgets === 'string') {
                 $scope.$parent.$watch(options.widgets, function (widgets) {
-                    console.log('widgets changed', widgets);
                     update(widgets);
                 });
             } else {
@@ -25,7 +24,6 @@ function $WidgetsDirective($templateCache) {
             }
 
             function update(widgets) {
-                console.log('update widgets', widgets);
                 var _widgets = [];
                 angular.forEach(widgets || [], function (widget) {
                     _widgets.push(merge(widget, defaults));

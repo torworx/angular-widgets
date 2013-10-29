@@ -1,4 +1,4 @@
-function Resources($http, $q) {
+function Resources($q, $http) {
     var assetsCompiler = new AssetsCompiler();
 
     /**

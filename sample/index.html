@@ -4,18 +4,26 @@
     <meta charset="utf-8">
     <title>Angular Widgets Sample</title>
     <link rel="stylesheet" type="text/css" href="../components/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="../build/angular-widgets.css"/>
     <style type="text/css">
         .panel-heading {
-            padding: 6px 10px 6px 10px;
+            position: absolute;
+            width: 100%;
             height: 30px;
-            text-align: center;
+            top: 0;
+            z-index: 9999;
+            -webkit-transition: all 0.3s;
+            -moz-transition: all 0.3s;
+            -o-transition: all 0.3s;
+            transition: all 0.3s;
         }
         .panel-title {
             font-size: 14px;
         }
         .panel-body {
+            height: 100%;
             padding: 0;
-            position: relative;
+            text-align: center;
         }
     </style>
 </head>
@@ -23,13 +31,23 @@
 <h2>Widget Area Example</h2>
 <p>This example shows functionality of angular-widgets.</p>
 
-<div ng-widgets="widgetsOptions"></div>
+<div style="padding: 10px; !important">
+    <div ng-widgets="widgetsOptions"></div>
+</div>
+
 
 <script src="../components/jquery/jquery.js"></script>
 <script src="../components/angular/angular.js"></script>
 <script src="../components/less.js/dist/less-1.5.0.js"></script>
+<script src="../components/ccui-foundation/ccui-foundation.js"></script>
+<script src="../components/ccui-draggablly/ccui-draggabilly.js"></script>
+<script src="../components/ccui-packery/ccui-packery.js"></script>
+<script src="../components/enquire/dist/enquire.js"></script>
 
 <script src="../build/angular-widgets.debug.js"></script>
+<script>
+    window.localStorage.debug = "*";
+</script>
 
 <script src="app.js"></script>
 

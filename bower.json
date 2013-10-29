@@ -24,7 +24,11 @@
     "angular": "~1.x",
     "jquery": "2.x",
     "jquery-ui": "latest",
-    "less.js": "~1.5.0"
+    "less.js": "~1.5.0",
+    "enquire": "~2.1.0",
+    "ccui-foundation": "taoyuan/ccui-foundation",
+    "ccui-packery": "taoyuan/ccui-packery",
+    "ccui-draggablly": "taoyuan/ccui-draggabilly"
   },
   "devDependencies": {
     "angular-mocks": "~1.x",

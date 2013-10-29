@@ -3,33 +3,9 @@ function $WidgetsProvider() {
     var queue = [],
         definitions = [];
 
-    function declare(statics) {
-        var constructor = function (options, element) {
-            // allow instantiation without "new" keyword
-            if (!this._init) {
-                return new constructor(options, element);
-            }
-
-            // allow instantiation without initializing for simple inheritance
-            // must use "new" keyword (the code above always passes args)
-            if (arguments.length) {
-                this._init(options, element);
-            }
-
-            return this;
-        };
-
-        extend(constructor, statics);
-        constructor.prototype = angular.extend(new Widget(), {
-            constructor: constructor
-        });
-        return constructor;
-    }
-
-    this.define = define;
-    function define(statics, prototype) {
-        if (!prototype) {
-            prototype = statics;
+    function declare(statics, data) {
+        if (!data) {
+            data = statics;
             statics = {};
         }
 
@@ -37,9 +13,33 @@ function $WidgetsProvider() {
             statics = {widgetName: statics};
         }
 
-        var constructor = declare(statics);
-        extend(constructor.prototype, prototype);
-        queue.push({clazz: constructor});
+        var NewClass = function WidgetConstructor(options) {
+            // allow instantiation without "new" keyword
+            if (!(this instanceof WidgetConstructor)) {
+                return new WidgetConstructor(options);
+            }
+
+            Widget.call(this, options);
+            extend(this, data);
+            // post create
+            if (this._create) {
+                this._create(options);
+            }
+            return this;
+        };
+
+        // inherit Widget methods
+        extend(NewClass, Widget, statics);
+        extend(NewClass.prototype, Widget.prototype);
+
+        return NewClass;
+    }
+
+    this.define = define;
+    function define(statics, data) {
+        queue.push(function ($q) {
+            return $q.when(declare(statics, data));
+        });
     }
 
     this.load = function (statics, url) {
@@ -48,39 +48,29 @@ function $WidgetsProvider() {
             statics = {};
         }
 
-        if (isString(statics)) {
-            statics = {widgetName: statics};
-        }
-
-        var constructor = declare(statics);
-        queue.push({ clazz: constructor, url: url });
-    };
-
-    function WidgetLoader($http, $q) {
-        return {
-            load: function load(clazz, url) {
-                var d = $q.defer();
-                $http.get(url + '/widget.js')
-                    .success(function (data) {
-                        console.log('loaded widget: ' + url);
-                        var fn = new Function('define', data);
-                        fn(function (prototype) {
-                            extend(clazz.prototype, prototype);
-                            clazz.location = url;
-                            clazz.prototype.location = url;
-                            return clazz;
-                        });
-                        d.resolve(clazz);
-                    })
-                    .error(function (err) {
-                        console.err("Could not load widget: " + url);
-                        d.resolve();
-//                        d.reject("Could not load widget: " + url);
+        queue.push(function ($q, $http) {
+            var WidgetClass;
+            var d = $q.defer();
+            $http.get(url + '/widget.js')
+                .success(function (data) {
+                    console.log('loaded widget: ' + url);
+                    var fn = new Function('define', data);
+                    fn(function (data) {
+                        WidgetClass = declare(statics, data);
+                        WidgetClass.location = url;
+                        WidgetClass.prototype.location = url;
+                        return WidgetClass;
                     });
-                return d.promise;
-            }
-        }
-    }
+                    d.resolve(WidgetClass);
+                })
+                .error(function (err) {
+                    console.err("Could not load widget: " + url);
+                    d.resolve();
+//                        d.reject("Could not load widget: " + url);
+                });
+            return d.promise;
+        });
+    };
 
     function loadResourcesFn(resources, $q) {
         return function () {
@@ -90,7 +80,7 @@ function $WidgetsProvider() {
                 promises.push(resources.load(this, 'view', 'view.html'));
                 promises.push(resources.load(this, 'style', 'style.less', function (extension, source) {
                     if (extension == 'less') {
-                        return '#' + self.id + ' .view { ' + source + ' }';
+                        return '#' + self.id + ' { ' + source + ' }';
                     }
                     return source;
                 }));
@@ -100,26 +90,21 @@ function $WidgetsProvider() {
         }
     }
 
-    function flush($http, $q) {
-        var loader = WidgetLoader($http, $q);
+    function flush($q, $http) {
         var promises = [];
-        forEach(queue, function (item) {
-            if (item.url) {
-                promises.push(loader.load(item.clazz, item.url));
-            } else {
-                promises.push($q.when(item.clazz));
-            }
+        forEach(queue, function (fn) {
+            promises.push(fn($q, $http));
         });
         return $q.all(promises);
     }
 
     this.$get = $get;
-    $get.$inject = ['$http', '$q'];
-    function $get($http, $q) {
-        var resources = new Resources($http, $q);
+    $get.$inject = ['$q', '$http'];
+    function $get($q, $http) {
+        var resources = new Resources($q, $http);
         var loadResources = loadResourcesFn(resources, $q);
 
-        var promise = flush($http, $q).then(function (results) {
+        var promise = flush($q, $http).then(function (results) {
             forEach(results, function (clazz) {
                 if (!clazz) return;
                 clazz.prototype.loadResources = loadResources;

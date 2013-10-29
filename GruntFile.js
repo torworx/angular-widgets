@@ -201,7 +201,7 @@ module.exports = function (grunt) {
                     // yuicompress: true
                 },
                 files: {
-                    "angular-widgets.css": ["src/less/global.less"]
+                    "build/angular-widgets.css": ["src/less/global.less"]
                 }
             },
             prod: {
@@ -209,7 +209,7 @@ module.exports = function (grunt) {
                     yuicompress: true
                 },
                 files: {
-                    "angular-widgets.min.css": ["src/less/global.less"]
+                    "build/angular-widgets.min.css": ["src/less/global.less"]
                 }
             }
         },
@@ -289,6 +289,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-angular-templates');
     grunt.loadNpmTasks('grunt-contrib-clean');
+
+    grunt.registerTask('debug-watch', ['watch:debug', 'watch:less']);
 
     // Old default task
     grunt.registerTask('build', ['ngtemplates', 'concat:debug', 'concat:prod', 'uglify:build', 'clean']);

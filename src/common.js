@@ -11,7 +11,7 @@ var idSeed = 0,
     forEach = angular.forEach,
     extend = angular.extend,
     copy = angular.copy,
-    toJson = angular.toJson;
+    noop = angular.noop;
 
 function id() {
     return idSeed++;

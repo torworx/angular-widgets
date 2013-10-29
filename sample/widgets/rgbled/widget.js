@@ -1,7 +1,11 @@
 define({
     name: 'RGB Color Wheel',
-    widgetize: function(scope, element) {
-// FUNCTIONS
+    bodyCls: 'view',
+    _widgetize: function() {
+        var scope = this.scope;
+        var element = this.element;
+
+        // FUNCTIONS
         function drawColorWheel(canvas, outsideRadius, insideRadius, colors) {
             var startAngle = -19;
             var arc = Math.PI / (colors.length/2);
@@ -65,58 +69,29 @@ define({
         }
 
 
-// INIT
+        // INIT
         var view = $(element);
         var colorwheel = view.find(".colorPicker");
         var colors = generateColorArray(16);
         colors.push("#FFFFFF");
         colors.push("#000000");
 
-// DRAW COLOR WHEEL
+        // DRAW COLOR WHEEL
         drawColorWheel(colorwheel[0], 70, 40, colors);
 
 
-// RECEIVING DEVICE DATA
+        // RECEIVING DEVICE DATA
         scope.onData = function(data) {
             $(element).find(".currentcolor").css({
                 backgroundColor: "#" + data.DA
             });
         };
 
-        scope.onData({DA: 'FF0000'});
+    },
 
-
-// ACTUATING DEVICE
-        colorwheel.on("click", function(event) {
-            var wheel = event.currentTarget;
-            // determine color
-            var pos = findPos(wheel);
-            var x,y;
-            if (event.type.indexOf("touch") >= 0) {
-                x = event.originalEvent.touches[0].pageX - pos.x;
-                y = event.originalEvent.touches[0].pageY - pos.y;
-            } else {
-                x = event.pageX - pos.x;
-                y = event.pageY - pos.y;
-            }
-            var coord = "x=" + x + ", y=" + y;
-            var c = wheel.getContext('2d');
-            var p = c.getImageData(x, y, 1, 1).data;
-            var hex = ("000000" + rgbToHex(p[0], p[1], p[2])).slice(-6);
-            var pval = hex.toUpperCase();
-
-            var payload = '{"DA":"'+pval+'"}';
-
-//  scope.onData(JSON.parse(payload));
-
-//            _.each(scope.Widget.devices, function(device, key) {
-//                // Use Browser Block to actuate
-//                var Device = new NinjaService.Device();
-//                Device.LoadData(device);
-//                Device.Emit(pval);
-//                console.log("Actuated")
-//
-//            });
+    data: function (data) {
+        $(this.element).find(".currentcolor").css({
+            backgroundColor: "#" + data['DA']
         });
     }
 });

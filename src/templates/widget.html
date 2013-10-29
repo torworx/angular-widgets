@@ -1,12 +1,10 @@
-<li>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h5 class="panel-title">
-                {{title}}
-            </h5>
-        </div>
-        <div class="panel-body view" ng-bind-html="view"></div>
-        <style type="text/css" ng-bind-html="style"></style>
+<div>
+    <div class="x-header drag-handle">
+        <h3>
+            {{title}}
+        </h3>
     </div>
-</li>
+    <div class="x-body" ng-bind-html="view"></div>
+    <style type="text/css" ng-bind-html="style"></style>
+</div>
 

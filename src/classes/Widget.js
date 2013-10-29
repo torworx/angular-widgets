@@ -1,14 +1,21 @@
-function Widget( /* options, element */ ) {
-}
+function Widget(options) {}
 
 Widget.prototype = {
     prefix: 'widget-',
-    _init: function( options ) {
+    _create: function( options ) {
         this.id = this.prefix + id();
-        angular.extend(this, options);
+        extend(this, options);
     },
 
-    widgetize: function (scope, element) {
-        console.log('widgetize');
+    _initialize: function (scope, element) {
+        this.scope = scope;
+        this.element = element;
+        this._widgetize();
+    },
+
+    _widgetize: noop,
+
+    data: function (data) {
+        // noop
     }
 };

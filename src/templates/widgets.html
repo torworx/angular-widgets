@@ -1,3 +1,5 @@
-<ul class="list-inline">
-    <div ng-widget ng-repeat="widget in widgets"></div>
-</ul>
+<section id="widgets-container" class="x-widgets-container">
+    <div ng-packery=".x-widget" class="widgets">
+        <div class="x-widget" ng-draggabilly ng-widget ng-repeat="widget in widgets"></div>
+    </div>
+</section>
