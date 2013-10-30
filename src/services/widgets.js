@@ -2,16 +2,15 @@ function $WidgetsProvider() {
 
     var debugWidgets = debug('ngw:widgets-service');
     var queue = [],
-        definitions = [];
+        definitions = [],
+        definitionsMap = {};
 
-    function declare(statics, data) {
-        if (!data) {
-            data = statics;
-            statics = {};
-        }
+    this.WidgetClass = WidgetClass;
 
-        if (isString(statics)) {
-            statics = {widgetName: statics};
+    function declare(name, settings, prototype) {
+        if (!prototype) {
+            prototype = settings;
+            settings = {};
         }
 
         var NewClass = function WidgetConstructor(options) {
@@ -20,35 +19,31 @@ function $WidgetsProvider() {
                 return new WidgetConstructor(options);
             }
 
-            Widget.call(this, options);
-            extend(this, data);
-            // post create
-            if (this._create) {
-                this._create(options);
-            }
+            WidgetClass.call(this, options);
+            extend(this, prototype);
             return this;
         };
 
         // inherit Widget methods
-        extend(NewClass, Widget, statics);
-        extend(NewClass.prototype, Widget.prototype);
+        extend(NewClass, WidgetClass, {widgetName: name});
+        extend(NewClass.prototype, WidgetClass.prototype);
+
+        NewClass.settings = settings;
 
         return NewClass;
     }
 
     this.define = define;
-    function define(statics, data) {
+    function define(name, settings, data) {
         queue.push(function ($q) {
-            return $q.when(declare(statics, data));
+            return $q.when(declare(name, settings, data));
         });
     }
 
-    this.load = function (statics, url) {
+    this.load = function (name, url) {
         if (!url) {
-            url = statics;
-            statics = {};
+            url = name;
         }
-
         queue.push(function ($q, $http) {
             var WidgetClass;
             var d = $q.defer();
@@ -56,8 +51,12 @@ function $WidgetsProvider() {
                 .success(function (data) {
                     debugWidgets('loaded widget: ' + url);
                     var fn = new Function('define', data);
-                    fn(function (data) {
-                        WidgetClass = declare(statics, data);
+                    fn(function (settings, prototype) {
+                        if (!prototype) {
+                            prototype = settings;
+                            settings = {};
+                        }
+                        WidgetClass = declare(name, settings, prototype);
                         WidgetClass.location = url;
                         WidgetClass.prototype.location = url;
                         return WidgetClass;
@@ -74,6 +73,7 @@ function $WidgetsProvider() {
     };
 
     var assetsCompiler = new AssetsCompiler();
+
     function loadResourcesFn(resources, $q) {
         return function () {
             var self = this;
@@ -105,7 +105,7 @@ function $WidgetsProvider() {
         }
 
         function assignResource(object, prop) {
-            return function(source) {
+            return function (source) {
                 object[prop] = source;
             }
         }
@@ -130,6 +130,7 @@ function $WidgetsProvider() {
                 if (!clazz) return;
                 clazz.prototype.loadResources = loadResources;
                 definitions.push(clazz);
+                definitionsMap[clazz.widgetName] = clazz;
             });
         }, function (reason) {
             console.err('widgets load failed: ' + reason);
@@ -137,7 +138,37 @@ function $WidgetsProvider() {
 
         return {
             ready: promise,
-            definitions: definitions
+            definitions: definitions,
+            widget: function (name, data) {
+                var Widget = definitionsMap[name];
+                if (!Widget) {
+                    return console.error('Unknown widget: ' + name);
+                }
+                return new Widget(data);
+            },
+            pack: function (widgets) {
+                if (!widgets) return null;
+                if (!isArray(widgets)) widgets = [widgets];
+                var results = [];
+                forEach(widgets, function (widget) {
+                    this.push({
+                        type: widget.constructor.widgetName,
+                        data: widget.toObject()
+                    });
+                }, results);
+                return results;
+            },
+            unpack: function (items) {
+                if (!items) return null;
+                if (!isArray(items)) items = [items];
+                var results = [];
+                forEach(items, function (item) {
+                    var Widget = definitionsMap[item.type];
+                    if (!Widget) return console.error('Unknown widget: ' + item.type);
+                    return this.push(new Widget(item.data));
+                }, results);
+                return results;
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
             var widget = $scope.widget;
             var $elBody = element.find('.x-body');
 
-            $scope.title = widget.name + ' #' + widget.id;
+            $scope.title = widget.name || widget.constructor.settings.name + ' #' + widget.id;
             $scope.view = $sce.trustAsHtml(widget.view);
             $scope.style = $sce.trustAsHtml(widget.style);
 
@@ -23,8 +23,21 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
                 $elBody.addClass(widget.bodyCls);
             }
 
+            $scope.toolClick = function (item, $event) {
+                if ($event.stopPropagation) $event.stopPropagation();
+                if ($event.preventDefault) $event.preventDefault();
+                if (isFunction(item.handler)) {
+                    item.handler($event, $scope);
+                }
+            };
+
+            $scope.deleteWidget = function () {
+                $scope.$parent.deleteWidget(widget);
+            };
+
             $timeout(function () {
-                widget._initialize($scope, $elBody);
+                widget.initialize($scope, $elBody);
+                widget.widgetize();
             });
 
             /**
@@ -35,12 +48,7 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
 
                 if (widget.id === $scope.widget.id) {
                     $scope.selected = !$scope.selected;
-
-                    var guids = [];
-                    forEach($scope.widget.devices, function (device, guid) {
-                        this.push(guid);
-                    }, guids);
-                    $rootScope.$broadcast($scope.selected ? ":widgetDevicesSelect" : ":widgetDevicesDeselect", guids);
+                    $rootScope.$broadcast($scope.selected ? ":widgetSelected" : ":widgetDeselected", widget);
                 }
             });
         }

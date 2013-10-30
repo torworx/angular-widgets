@@ -1,10 +1,16 @@
-<div class="panel panel-default">
-    <div class="x-header drag-handle">
-        <h3 ng-click="select(widget)">
-            {{title}}
-        </h3>
+<div class="panel" ng-class="{'panel-default': !selected, 'panel-selected': selected}">
+    <div class="x-header panel-heading drag-handle" ng-click="selectWidget(widget)">
+        <h1>{{title}}</h1>
+        <span class="x-tools pull-right">
+            <span class="glyphicon"
+                  ng-class="tool.type ? 'glyphicon-' + tool.type : ''"
+                  ng-click="toolClick(tool, $event)"
+                  ng-repeat="tool in widget.tools">
+            </span>
+
+        </span>
     </div>
-    <div class="x-body" ng-bind-html="view"></div>
+    <div class="panel-body x-body" ng-bind-html="view"></div>
     <style type="text/css" ng-bind-html="style"></style>
 </div>
 

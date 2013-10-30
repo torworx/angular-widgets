@@ -1,5 +1,5 @@
-$WidgetsDirective.$inject = ['$templateCache'];
-function $WidgetsDirective($templateCache) {
+$WidgetsDirective.$inject = ['$rootScope', '$templateCache', '$timeout'];
+function $WidgetsDirective($rootScope, $templateCache, $timeout) {
     var debugWidgetsDirective = debug('ngw:widgets-directive')
     return {
         template: $templateCache.get('widgets.html'),
@@ -25,16 +25,30 @@ function $WidgetsDirective($templateCache) {
             }
 
             function update(widgets) {
-                $scope.widgets = [];
-                angular.forEach(widgets || [], function (widget) {
-                    $scope.widgets.push(merge(widget, defaults));
+                $scope.widgets = widgets;
+                angular.forEach(widgets, function (widget) {
+                    merge(widget, defaults, options.widget);
+                });
+
+                $timeout(function () {
+                    $rootScope.$broadcast(':widgetsLoaded', $scope.widgets);
                 });
             }
             
-            $scope.select = function (widget) {
-                debugWidgetsDirective('select widget #' + widget.id);
-                $scope.$broadcast(':widgetSelect', widget);
-            }
+            $scope.selectWidget = function (widget) {
+                debugWidgetsDirective('selecting widget #' + widget.id);
+                $rootScope.$broadcast(':widgetSelect', widget);
+            };
+
+            $scope.deleteWidget = function (widget) {
+                debugWidgetsDirective('deleting widget #' + widget.id);
+//                var _widget = copy(widget);
+                $scope.widgets.splice($scope.widgets.indexOf(widget), 1);
+                $rootScope.$broadcast(':widgetDeleted', widget, $scope.widgets);
+                $timeout(function () {
+                    $rootScope.$broadcast(':widgetsLoaded', $scope.widgets);
+                });
+            };
         }
     };
 }

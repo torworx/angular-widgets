@@ -1,19 +1,20 @@
 define({
-    name: 'Temperature',
-    _widgetize: function() {
+    name: 'Temperature'
+},{
+    widgetize: function() {
         var element = this.element;
         var temperature = element.find(".my_temperature .value");
 
-        this.units = element.find(".my_temperature small");
+        var units = element.find(".my_temperature small");
         if (temperature.html() === "") {
-            this.units.hide()
+            units.hide()
         } else {
-            this.units.show();
+            units.show();
         }
-    },
 
-    data: function (data) {
-        this.element.find(".my_temperature .value").html(data.DA);
-        this.units.show();
+        this.onData = function (data) {
+            element.find(".my_temperature .value").html(data.DA);
+            units.show();
+        }
     }
 });

@@ -140,6 +140,10 @@ module.exports = function (grunt) {
             less: {
                 files: ['src/less/**/*.less'],
                 tasks: ['less']
+            },
+            stylus: {
+                files: ['src/less/**/*.styl'],
+                tasks: ['stylus']
             }
         },
         ngtemplates: {
@@ -210,6 +214,24 @@ module.exports = function (grunt) {
                 },
                 files: {
                     "build/angular-widgets.min.css": ["src/less/global.less"]
+                }
+            }
+        },
+        stylus: {
+            build: {
+                options: {
+                    // compress: true
+                },
+                files: {
+                    "build/angular-widgets.css": ["src/less/global.styl"]
+                }
+            },
+            prod: {
+                options: {
+                    compress: true
+                },
+                files: {
+                    "build/angular-widgets.min.css": ["src/less/global.styl"]
                 }
             }
         },
@@ -285,15 +307,16 @@ module.exports = function (grunt) {
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-less');
+    grunt.loadNpmTasks('grunt-contrib-stylus');
     //grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-angular-templates');
     grunt.loadNpmTasks('grunt-contrib-clean');
 
-    grunt.registerTask('debug-watch', ['watch:debug', 'watch:less']);
+    grunt.registerTask('debug-watch', ['watch:debug', 'watch:stylus']);
 
     // Old default task
-    grunt.registerTask('build', ['ngtemplates', 'concat:debug', 'concat:prod', 'uglify:build', 'clean']);
+    grunt.registerTask('build', ['ngtemplates', 'concat:debug', 'concat:prod', 'uglify:build', 'stylus', 'clean']);
 
     // Default task(s).
     grunt.registerTask('default', 'No default task', function() {

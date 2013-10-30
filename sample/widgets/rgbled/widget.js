@@ -1,7 +1,8 @@
 define({
-    name: 'RGB Color Wheel',
+    name: 'RGB Color Wheel'
+}, {
     bodyCls: 'view',
-    _widgetize: function() {
+    widgetize: function() {
         var scope = this.scope;
         var element = this.element;
 
@@ -81,17 +82,11 @@ define({
 
 
         // RECEIVING DEVICE DATA
-        scope.onData = function(data) {
+        this.onData = function(data) {
             $(element).find(".currentcolor").css({
                 backgroundColor: "#" + data.DA
             });
         };
 
-    },
-
-    data: function (data) {
-        $(this.element).find(".currentcolor").css({
-            backgroundColor: "#" + data['DA']
-        });
     }
 });
