@@ -1,7 +1,7 @@
 define({
     name: 'Temperature'
 },{
-    widgetize: function() {
+    _widgetize: function() {
         var element = this.element;
         var temperature = element.find(".my_temperature .value");
 

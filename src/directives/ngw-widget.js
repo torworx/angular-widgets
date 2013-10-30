@@ -36,7 +36,11 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
             };
 
             $timeout(function () {
-                widget.initialize($scope, $elBody);
+                widget.initialize({
+                    scope: $scope,
+                    element: $elBody,
+                    $timeout: $timeout
+                });
                 widget.widgetize();
             });
 

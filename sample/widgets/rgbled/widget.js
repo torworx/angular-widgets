@@ -2,7 +2,7 @@ define({
     name: 'RGB Color Wheel'
 }, {
     bodyCls: 'view',
-    widgetize: function() {
+    _widgetize: function() {
         var scope = this.scope;
         var element = this.element;
 

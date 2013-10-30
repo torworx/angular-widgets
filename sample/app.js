@@ -1,16 +1,3 @@
-function random(max) {
-    return Math.floor((Math.random() * max) + 1);
-}
-
-var Generators = {
-    temperature: function () {
-        return random(30);
-    },
-    rgbled: function () {
-        return random(255).toString(16) + random(255).toString(16) + random(255).toString(16);
-    }
-};
-
 function generateSampleDevices(types) {
     var devices = {};
     types.forEach(function (type, index) {
@@ -36,18 +23,29 @@ function getSampleDevices() {
     ]);
 }
 
-function findWidget(widgets, id) {
-    for (var i = 0; i < widgets.length; i++) {
-        if (widgets[i].id == id) return widgets[i];
-    }
-    return null;
+function random(max) {
+    return Math.floor((Math.random() * max) + 1);
 }
+
+var generators = {
+    temperature: function () {
+        return random(30);
+    },
+    rgbled: function () {
+        return random(255).toString(16) + random(255).toString(16) + random(255).toString(16);
+    }
+};
+
+function generateData(device) {
+    return {GUID: device.GUID, DA: generators[device.deviceType]()};
+}
+
 
 function loopGenerate($rootScope, widgets, $timeout) {
     $timeout(function () {
         var widget = widgets[random(widgets.length) - 1];
         angular.forEach(widget.devices, function (device) {
-            $rootScope.$broadcast(':data', {GUID: device.GUID, DA: Generators[device.deviceType]()});
+            $rootScope.$broadcast(':data', generateData(device));
         });
         loopGenerate($rootScope, widgets, $timeout);
     }, 5000);
@@ -70,11 +68,47 @@ app.config(function ($widgetsProvider) {
                     self.onData(data);
                 }
             });
+        },
+
+        afterWidgetize: function () {
+            var self = this;
+            this.$timeout(function () {
+                _.each(self.devices, function(device, key) {
+                    if (device) {
+                        var dataObject = {
+                            G: device.gid,
+                            V: device.vid,
+                            D: device.did,
+                            node: device.node
+                        };
+                        _.extend(dataObject, device.last_data);
+                        self.onData(dataObject);
+                    }
+                });
+            });
         }
     });
 
     $widgetsProvider.load('temperature', 'widgets/temperature');
     $widgetsProvider.load('rgbled', 'widgets/rgbled');
+});
+
+app.service('storage', function ($widgets) {
+    var __widgets;
+    this.loadWidgets = function () {
+        if (!__widgets) {
+            var items = window.localStorage.widgets && JSON.parse(window.localStorage.widgets);
+            __widgets = $widgets.unpack(items);
+        }
+        return __widgets;
+    };
+
+    this.saveWidgets = function (widgets) {
+        __widgets = null;
+        var items = $widgets.pack(widgets);
+        window.localStorage.widgets = items ? JSON.stringify(items) : null;
+    };
+
 });
 
 app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $widgets, storage) {
@@ -138,22 +172,4 @@ app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $widgets, s
     $rootScope.$on(':widgetDeleted', function (event, widget) {
         storage.saveWidgets($scope.widgets);
     });
-});
-
-app.service('storage', function ($widgets) {
-    var __widgets;
-    this.loadWidgets = function () {
-        if (!__widgets) {
-            var items = window.localStorage.widgets && JSON.parse(window.localStorage.widgets);
-            __widgets = $widgets.unpack(items);
-        }
-        return __widgets;
-    };
-
-    this.saveWidgets = function (widgets) {
-        __widgets = null;
-        var items = $widgets.pack(widgets);
-        window.localStorage.widgets = items ? JSON.stringify(items) : null;
-    };
-
 });
