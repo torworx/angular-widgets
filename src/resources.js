@@ -1,6 +1,5 @@
 function Resources($q, $http) {
 
-    var assetsCompiler = new AssetsCompiler();
     var debugResources = debug('ngw:resources');
 
     /**
@@ -8,10 +7,9 @@ function Resources($q, $http) {
      * @param object
      * @param prop
      * @param resName
-     * @param {Function|?} intercept
      * @returns {*|Promise}
      */
-    this.load = function (object, prop, resName, intercept) {
+    this.load = function (object, prop, resName) {
         var d, p,
             data = object[prop],
             dataUrl = object[prop + 'Url'];
@@ -22,26 +20,24 @@ function Resources($q, $http) {
         if (data) {
             p = $q.when(data);
         } else if (dataUrl) {
-            var i = dataUrl.lastIndexOf('.');
-            var extension = i < 0 ? '' : dataUrl.substring(i + 1);
+//            var i = dataUrl.lastIndexOf('.');
+//            var extension = i < 0 ? '' : dataUrl.substring(i + 1);
             d = $q.defer();
             debugResources('loading resource "' + prop + '" from ' + dataUrl);
             $http.get(dataUrl).then(function (result) {
-                var source = intercept ? intercept(extension, result.data) : result.data;
-                if (assetsCompiler.hasCompiler(extension)) {
-                    assetsCompiler.compile(extension, source, function (err, compiledCode) {
-                        d.resolve(compiledCode);
-                    });
-                } else {
-                    d.resolve(source);
-                }
+                d.resolve(result.data);
+//                var source = intercept ? intercept(extension, result.data) : result.data;
+//                if (assetsCompiler.hasCompiler(extension)) {
+//                    assetsCompiler.compile(extension, source, function (err, compiledCode) {
+//                        d.resolve(compiledCode);
+//                    });
+//                } else {
+//                    d.resolve(source);
+//                }
 
             });
             p = d.promise;
         }
-        return p ? p.then(function (data) {
-            debugResources('loaded resource "' + prop + '" from ' + dataUrl);
-            return object[prop] = data;
-        }) : $q.when();
+        return p || $q.when();
     };
 }

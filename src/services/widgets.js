@@ -73,21 +73,41 @@ function $WidgetsProvider() {
         });
     };
 
+    var assetsCompiler = new AssetsCompiler();
     function loadResourcesFn(resources, $q) {
         return function () {
             var self = this;
             if (!self._resready) {
                 var promises = [];
-                promises.push(resources.load(this, 'view', 'view.html'));
-                promises.push(resources.load(this, 'style', 'style.less', function (extension, source) {
-                    if (extension == 'less') {
-                        return '#' + self.id + ' { ' + source + ' }';
-                    }
-                    return source;
-                }));
+                promises.push(resources.load(self, 'view', 'view.html')
+                    .then(assignResource(self, 'view')));
+
+                promises.push(resources.load(self, 'style', 'style.less')
+                    .then(compileStyles(self.id))
+                    .then(assignResource(self, 'style')));
+
                 self._resready = $q.all(promises);
             }
             return self._resready;
+        };
+
+        function compileStyles(id) {
+            return function (source) {
+                var d = $q.defer();
+                assetsCompiler.compile('less', '#' + id + ' { ' + source + ' }', function (err, compiledCode) {
+                    if (err) {
+                        console.error(err);
+                    }
+                    d.resolve(compiledCode);
+                });
+                return d.promise;
+            }
+        }
+
+        function assignResource(object, prop) {
+            return function(source) {
+                object[prop] = source;
+            }
         }
     }
 

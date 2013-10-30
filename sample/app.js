@@ -48,7 +48,8 @@ function saveWidgets(widgets) {
     var items = [];
     widgets.forEach(function (widget) {
         items.push({
-            device: widget.device
+            deviceType: widget.deviceType,
+            devices: widget.devices
         })
     });
     window.localStorage.widgets = JSON.stringify(items);
@@ -64,11 +65,20 @@ function findWidget(widgets, id) {
 function loopGenerate(widgets, $timeout) {
     $timeout(function () {
         angular.forEach(widgets, function (widget) {
-            widget.data({DA: Generators[widget.device.deviceType]()});
+            angular.forEach(widget.devices, function (device) {
+                widget.data({DA: Generators[device.deviceType]()});
+            });
         });
         loopGenerate(widgets, $timeout);
     }, 1000);
 }
+
+function transform(device) {
+    var result = {};
+    result[device.guid] = device;
+    return result;
+}
+
 
 var app = angular.module('myApp', ['widgets']);
 
@@ -90,11 +100,17 @@ app.controller('MyCtrl', ['$rootScope', '$scope', '$q', '$timeout', '$widgets',
             var items = loadWidgets();
             if (items) {
                 angular.forEach(items, function (item) {
-                    widgets.push(new Widgets[item.device.deviceType]({device: item.device}))
+                    widgets.push(new Widgets[item.deviceType]({
+                        deviceType: item.deviceType,
+                        devices: item.devices
+                    }))
                 });
             } else {
                 angular.forEach(getSampleDevices(), function (device) {
-                    widgets.push(new Widgets[device.deviceType]({device: device}));
+                    widgets.push(new Widgets[device.deviceType]({
+                        deviceType: device.deviceType,
+                        devices: transform(device)})
+                    );
                 });
                 saveWidgets(widgets);
             }

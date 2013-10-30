@@ -1,17 +1,17 @@
+$WidgetDirective.$inject = ['$rootScope', '$templateCache', '$sce', '$timeout'];
+function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
 
-$WidgetDirective.$inject = ['$templateCache', '$sce', '$timeout'];
-function $WidgetDirective($templateCache, $sce, $timeout) {
     return {
         template: $templateCache.get('widget.html'),
         replace: true,
         restrict: 'EA',
-        link: function($scope, element) {
+        link: function ($scope, element) {
 
             var $el = $(element);
             var widget = $scope.widget;
             var $elBody = element.find('.x-body');
 
-            $scope.title = widget.name;
+            $scope.title = widget.name + ' #' + widget.id;
             $scope.view = $sce.trustAsHtml(widget.view);
             $scope.style = $sce.trustAsHtml(widget.style);
 
@@ -25,6 +25,23 @@ function $WidgetDirective($templateCache, $sce, $timeout) {
 
             $timeout(function () {
                 widget._initialize($scope, $elBody);
+            });
+
+            /**
+             * Select a Widget
+             */
+            $scope.$on(":widgetSelect", function (event, widget) {
+                $scope.selected = false;
+
+                if (widget.id === $scope.widget.id) {
+                    $scope.selected = !$scope.selected;
+
+                    var guids = [];
+                    forEach($scope.widget.devices, function (device, guid) {
+                        this.push(guid);
+                    }, guids);
+                    $rootScope.$broadcast($scope.selected ? ":widgetDevicesSelect" : ":widgetDevicesDeselect", guids);
+                }
             });
         }
     };

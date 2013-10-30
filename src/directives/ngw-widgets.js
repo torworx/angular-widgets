@@ -1,13 +1,14 @@
 $WidgetsDirective.$inject = ['$templateCache'];
 function $WidgetsDirective($templateCache) {
+    var debugWidgetsDirective = debug('ngw:widgets-directive')
     return {
         template: $templateCache.get('widgets.html'),
         replace: true,
         restrict: 'EA',
         scope: true,
-        link: function($scope, iElement, iAttrs) {
+        link: function($scope, element, attrs) {
             console.log('widgets directive link');
-            var options = $scope.$eval(iAttrs.ngwWidgets);
+            var options = $scope.$eval(attrs.ngwWidgets);
             if (!options) return;
 
             var defaults = extend({
@@ -24,11 +25,15 @@ function $WidgetsDirective($templateCache) {
             }
 
             function update(widgets) {
-                var _widgets = [];
+                $scope.widgets = [];
                 angular.forEach(widgets || [], function (widget) {
-                    _widgets.push(merge(widget, defaults));
+                    $scope.widgets.push(merge(widget, defaults));
                 });
-                $scope.widgets = _widgets;
+            }
+            
+            $scope.select = function (widget) {
+                debugWidgetsDirective('select widget #' + widget.id);
+                $scope.$broadcast(':widgetSelect', widget);
             }
         }
     };
