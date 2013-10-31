@@ -1,5 +1,7 @@
 define({
-    name: 'Temperature'
+    name: 'Temperature',
+    sizeX: 1,
+    sizeY: 1
 },{
     _widgetize: function() {
         var element = this.element;

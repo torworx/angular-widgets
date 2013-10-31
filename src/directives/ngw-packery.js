@@ -108,8 +108,8 @@ function $PackeryDirective($rootScope, $timeout) {
                         packeryRelease();
                         // forceShowItems();
                         debugPackery("unmatched");
-                        element.find(attrs.packery).css({
-                            top: '', left: '', position: '', opacity: 1
+                        element.find(attrs.ngwPackery).css({
+                            top: '', left: '', position: 'relative', opacity: 1
                         });
                         $rootScope.$broadcast(":undraggable");
                     }, 100)
@@ -144,7 +144,7 @@ function $PackeryDirective($rootScope, $timeout) {
                 }
             });
 
-            $rootScope.$on(":doLayout", function(event) {
+            $rootScope.$on(":layoutChanged", function(event) {
                 $timeout(function() {
                     packeryRefresh();
                 }, 500)

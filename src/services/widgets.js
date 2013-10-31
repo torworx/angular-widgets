@@ -7,28 +7,29 @@ function $WidgetsProvider() {
 
     this.WidgetClass = WidgetClass;
 
-    function declare(name, settings, prototype) {
-        if (!prototype) {
-            prototype = settings;
-            settings = {};
+    function declare(name, settings, properties) {
+        if (!properties) {
+            properties = settings;
+            settings = null;
         }
 
-        var NewClass = function WidgetConstructor(options) {
-            // allow instantiation without "new" keyword
+        var NewClass = function WidgetConstructor(data) {
             if (!(this instanceof WidgetConstructor)) {
-                return new WidgetConstructor(options);
+                return new WidgetConstructor(data);
             }
 
-            WidgetClass.call(this, options);
-            extend(this, prototype);
+            WidgetClass.call(this, data);
             return this;
         };
 
         // inherit Widget methods
         extend(NewClass, WidgetClass, {widgetName: name});
-        extend(NewClass.prototype, WidgetClass.prototype);
+        extend(NewClass.prototype, WidgetClass.prototype, properties);
 
-        NewClass.settings = settings;
+        if (settings) {
+            NewClass.settings = settings;
+            NewClass.prototype.settings = settings;
+        }
 
         return NewClass;
     }

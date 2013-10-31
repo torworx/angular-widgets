@@ -32,6 +32,7 @@
     z-index 9999
     /*transition all 0.3s*/
 
+    cursor default
     &:hover
       cursor move
 
@@ -61,4 +62,10 @@
   .x-body 
     height 100%
     padding 0
+
+@media screen and (max-width: 480px)
+  .x-widgets-container
+    .x-header
+      &:hover
+        cursor default
   

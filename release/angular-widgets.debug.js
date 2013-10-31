@@ -2,7 +2,7 @@
 * angular-widgets JavaScript Library
 * Authors: https://github.com/torworx/angular-widgets/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 2013-10-30 22:53
+* Compiled At: 2013-10-31 11:01
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -326,28 +326,29 @@ function $WidgetsProvider() {
 
     this.WidgetClass = WidgetClass;
 
-    function declare(name, settings, prototype) {
-        if (!prototype) {
-            prototype = settings;
-            settings = {};
+    function declare(name, settings, properties) {
+        if (!properties) {
+            properties = settings;
+            settings = null;
         }
 
-        var NewClass = function WidgetConstructor(options) {
-            // allow instantiation without "new" keyword
+        var NewClass = function WidgetConstructor(data) {
             if (!(this instanceof WidgetConstructor)) {
-                return new WidgetConstructor(options);
+                return new WidgetConstructor(data);
             }
 
-            WidgetClass.call(this, options);
-            extend(this, prototype);
+            WidgetClass.call(this, data);
             return this;
         };
 
         // inherit Widget methods
         extend(NewClass, WidgetClass, {widgetName: name});
-        extend(NewClass.prototype, WidgetClass.prototype);
+        extend(NewClass.prototype, WidgetClass.prototype, properties);
 
-        NewClass.settings = settings;
+        if (settings) {
+            NewClass.settings = settings;
+            NewClass.prototype.settings = settings;
+        }
 
         return NewClass;
     }
@@ -696,8 +697,8 @@ function $PackeryDirective($rootScope, $timeout) {
                         packeryRelease();
                         // forceShowItems();
                         debugPackery("unmatched");
-                        element.find(attrs.packery).css({
-                            top: '', left: '', position: '', opacity: 1
+                        element.find(attrs.ngwPackery).css({
+                            top: '', left: '', position: 'relative', opacity: 1
                         });
                         $rootScope.$broadcast(":undraggable");
                     }, 100)
@@ -732,7 +733,7 @@ function $PackeryDirective($rootScope, $timeout) {
                 }
             });
 
-            $rootScope.$on(":doLayout", function(event) {
+            $rootScope.$on(":layoutChanged", function(event) {
                 $timeout(function() {
                     packeryRefresh();
                 }, 500)
@@ -746,6 +747,30 @@ function $PackeryDirective($rootScope, $timeout) {
 }
 
 angular.module('widgets.directives').directive('ngwPackery', $PackeryDirective);
+$SizableDirective.$inject = ['$rootScope'];
+function $SizableDirective($rootScope) {
+
+    return {
+        restrict: 'A',
+        link: function postLink(scope, element, attrs) {
+            var $el = $(element);
+            var baseWidth = $el.width();
+            var baseHeight = $el.height();
+            var gutter = 20;
+
+            scope.$watch('widget.settings.sizeX', function (newX, oldX) {
+                element.width(baseWidth * newX + (gutter * (newX - 1)));
+                $rootScope.$broadcast(":layoutChanged");
+            });
+
+            scope.$watch('widget.settings.sizeY', function (newY, oldY) {
+                element.height(baseHeight * newY + (gutter * (newY - 1)));
+                $rootScope.$broadcast(":layoutChanged");
+            });
+        }
+    }
+}
+angular.module('widgets.directives').directive('ngwSizable', $SizableDirective);
 $WidgetDirective.$inject = ['$rootScope', '$templateCache', '$sce', '$timeout'];
 function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
 
@@ -759,7 +784,7 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
             var widget = $scope.widget;
             var $elBody = element.find('.x-body');
 
-            $scope.title = widget.name || widget.constructor.settings.name + ' #' + widget.id;
+            $scope.title = widget.name || widget.settings.name + ' #' + widget.id;
             $scope.view = $sce.trustAsHtml(widget.view);
             $scope.style = $sce.trustAsHtml(widget.style);
 
@@ -888,7 +913,7 @@ angular.module("widgets").run(["$templateCache", function($templateCache) {
   $templateCache.put("widgets.html",
     "<section id=\"widgets-container\" class=\"x-widgets-container meticulous\">\n" +
     "    <div ngw-packery=\".x-widget\" class=\"widgets packery\">\n" +
-    "        <div class=\"x-widget\" ngw-widget ngw-draggabilly ng-repeat=\"widget in widgets\"></div>\n" +
+    "        <div class=\"x-widget\" ngw-widget ngw-draggabilly ngw-sizable ng-repeat=\"widget in widgets\"></div>\n" +
     "    </div>\n" +
     "</section>"
   );

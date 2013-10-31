@@ -54,7 +54,7 @@ function loopGenerate($rootScope, widgets, $timeout) {
 var app = angular.module('myApp', ['widgets']);
 
 app.config(function ($widgetsProvider) {
-    var properties = ['devices'];
+    var properties = ['devices', 'settings'];
     $widgetsProvider.WidgetClass.extend({
         toObject: function () {
             return _.pick(this, properties);

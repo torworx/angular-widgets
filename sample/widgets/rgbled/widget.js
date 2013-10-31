@@ -1,5 +1,7 @@
 define({
-    name: 'RGB Color Wheel'
+    name: 'RGB Color Wheel',
+    sizeX: 1,
+    sizeY: 1
 }, {
     bodyCls: 'view',
     _widgetize: function() {

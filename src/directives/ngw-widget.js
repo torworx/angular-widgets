@@ -11,7 +11,7 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
             var widget = $scope.widget;
             var $elBody = element.find('.x-body');
 
-            $scope.title = widget.name || widget.constructor.settings.name + ' #' + widget.id;
+            $scope.title = widget.name || widget.settings.name + ' #' + widget.id;
             $scope.view = $sce.trustAsHtml(widget.view);
             $scope.style = $sce.trustAsHtml(widget.style);
 
