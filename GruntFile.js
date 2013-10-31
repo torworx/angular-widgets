@@ -142,7 +142,7 @@ module.exports = function (grunt) {
                 tasks: ['less']
             },
             stylus: {
-                files: ['src/less/**/*.styl'],
+                files: ['src/styl/**/*.styl'],
                 tasks: ['stylus']
             }
         },
@@ -223,7 +223,7 @@ module.exports = function (grunt) {
                     // compress: true
                 },
                 files: {
-                    "release/angular-widgets.css": ["src/less/global.styl"]
+                    "release/angular-widgets.css": ["src/styl/global.styl"]
                 }
             },
             prod: {
@@ -231,7 +231,7 @@ module.exports = function (grunt) {
                     compress: true
                 },
                 files: {
-                    "release/angular-widgets.min.css": ["src/less/global.styl"]
+                    "release/angular-widgets.min.css": ["src/styl/global.styl"]
                 }
             }
         },
