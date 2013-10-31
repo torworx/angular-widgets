@@ -13,7 +13,7 @@ define({
         }
 
         this.onData = function (data) {
-            element.find(".my_temperature .value").html(data.DA);
+            temperature.html(data.DA);
             units.show();
         }
     }

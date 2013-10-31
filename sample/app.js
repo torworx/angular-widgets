@@ -74,7 +74,7 @@ app.config(function ($widgetsProvider) {
             var self = this;
             this.$timeout(function () {
                 _.each(self.devices, function(device, key) {
-                    if (device) {
+                    if (device && device.last_data) {
                         var dataObject = {
                             G: device.gid,
                             V: device.vid,
@@ -97,8 +97,9 @@ app.service('storage', function ($widgets) {
     var __widgets;
     this.loadWidgets = function () {
         if (!__widgets) {
-            var items = window.localStorage.widgets && JSON.parse(window.localStorage.widgets);
-            __widgets = $widgets.unpack(items);
+            if (window.localStorage.widgets) {
+                __widgets = $widgets.unpack(JSON.parse(window.localStorage.widgets));
+            }
         }
         return __widgets;
     };
@@ -108,6 +109,11 @@ app.service('storage', function ($widgets) {
         var items = $widgets.pack(widgets);
         window.localStorage.widgets = items ? JSON.stringify(items) : null;
     };
+
+    this.clearWidgets = function () {
+        __widgets = null;
+        delete window.localStorage.widgets;
+    }
 
 });
 
@@ -125,7 +131,7 @@ app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $widgets, s
             });
             storage.saveWidgets(results);
             return results;
-        });
+        })();
 
         // load widgets resources
         var promises = [];
@@ -160,6 +166,10 @@ app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $widgets, s
                 }
             ]
         }
+    };
+
+    $scope.clear = function() {
+        storage.clearWidgets();
     };
 
     $rootScope.$on(':widgetsReordered', function (event, ids) {
