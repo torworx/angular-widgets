@@ -13,5 +13,6 @@
 .x-widgets-container .x-header .x-tools{margin-top:6px;margin-right:4px;font-size:10px;color:#808080;opacity:.3;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";filter:alpha(opacity=30);}
 .x-widgets-container .x-header .x-tools span{margin-left:5px;color:#a7a7a7;font-size:12px;cursor:pointer}
 .x-widgets-container .x-body{height:100%;padding:0}
-@media screen and (max-width: 480px){.x-widgets-container .x-header:hover{cursor:default}
+@media screen and (max-width: 480px){.x-widgets-container .x-widget{margin-bottom:20px}
+.x-widgets-container .x-header:hover{cursor:default}
 }

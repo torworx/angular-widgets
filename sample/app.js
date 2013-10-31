@@ -73,7 +73,7 @@ app.config(function ($widgetsProvider) {
         afterWidgetize: function () {
             var self = this;
             this.$timeout(function () {
-                _.each(self.devices, function(device, key) {
+                _.each(self.devices, function (device, key) {
                     if (device && device.last_data) {
                         var dataObject = {
                             G: device.gid,
@@ -96,23 +96,39 @@ app.config(function ($widgetsProvider) {
 app.service('storage', function ($widgets) {
     var __widgets;
     this.loadWidgets = function () {
-        if (!__widgets) {
-            if (window.localStorage.widgets) {
-                __widgets = $widgets.unpack(JSON.parse(window.localStorage.widgets));
+        try {
+            if (!__widgets && window.localStorage) {
+                if (window.localStorage.widgets) {
+                    __widgets = $widgets.unpack(JSON.parse(window.localStorage.widgets));
+                }
             }
+        } catch (e) {
+            console.log(e);
         }
+
         return __widgets;
     };
 
     this.saveWidgets = function (widgets) {
         __widgets = null;
-        var items = $widgets.pack(widgets);
-        window.localStorage.widgets = items ? JSON.stringify(items) : null;
+
+        try {
+            if (window.localStorage) {
+                var items = $widgets.pack(widgets);
+                window.localStorage.widgets = items ? JSON.stringify(items) : null;
+            }
+        } catch (e) {
+            console.log(e);
+        }
     };
 
     this.clearWidgets = function () {
         __widgets = null;
-        delete window.localStorage.widgets;
+        try {
+            if (window.localStorage) delete window.localStorage.widgets;
+        } catch (e) {
+            console.log(e);
+        }
     }
 
 });
@@ -120,7 +136,7 @@ app.service('storage', function ($widgets) {
 app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $widgets, storage) {
     $widgets.ready.then(function () {
         // load widgets
-        var widgets = storage.loadWidgets() || (function() {
+        var widgets = storage.loadWidgets() || (function () {
             var results = [];
             angular.forEach(getSampleDevices(), function (device, guid) {
                 var devices = {};
@@ -168,7 +184,7 @@ app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $widgets, s
         }
     };
 
-    $scope.clear = function() {
+    $scope.clear = function () {
         storage.clearWidgets();
     };
 
