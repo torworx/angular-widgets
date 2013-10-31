@@ -13,7 +13,7 @@ module.exports = function (config) {
             'components/angular-mocks/angular-mocks.js',
 
             // App code
-            'build/angular-widgets.debug.js',
+            '../release/angular-widgets.debug.js',
 
             // Test helper
             'test/helper.js',

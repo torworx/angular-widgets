@@ -129,7 +129,7 @@ module.exports = function (grunt) {
         watch: {
             // Run unit test with karma
             karma: {
-                files: ['build/angular-widgets.debug.js', 'test/**/*.test.js'],
+                files: ['release/angular-widgets.debug.js', 'test/**/*.test.js'],
                 tasks: ['karma:watch:run']
             },
             // Auto-build angular-widgets.debug.js when source files change
@@ -150,7 +150,7 @@ module.exports = function (grunt) {
             widgets: {
                 options: { base: 'src/templates' },
                 src: ['src/templates/**.html'],
-                dest: 'build/templates.js'
+                dest: 'release/templates.js'
             }
         },
         concat: {
@@ -173,11 +173,11 @@ module.exports = function (grunt) {
                     }
                 },
                 src: ['<%= srcFiles %>'],
-                dest: 'build/<%= pkg.name %>.js'
+                dest: 'release/<%= pkg.name %>.js'
             },
             debug: {
                 src: ['<%= srcFiles %>'],
-                dest: 'build/<%= pkg.name %>.debug.js'
+                dest: 'release/<%= pkg.name %>.debug.js'
             },
             version: {
                 src: ['<%= srcFiles %>'],
@@ -186,8 +186,8 @@ module.exports = function (grunt) {
         },
         uglify: {
             build: {
-                src: 'build/<%= pkg.name %>.js',
-                dest: 'build/<%= pkg.name %>.min.js'
+                src: 'release/<%= pkg.name %>.js',
+                dest: 'release/<%= pkg.name %>.min.js'
             },
             version: {
                 src: '<%= pkg.name %>-<%= pkg.version %>.debug.js',
@@ -205,7 +205,7 @@ module.exports = function (grunt) {
                     // yuicompress: true
                 },
                 files: {
-                    "build/angular-widgets.css": ["src/less/global.less"]
+                    "release/angular-widgets.css": ["src/less/global.less"]
                 }
             },
             prod: {
@@ -213,7 +213,7 @@ module.exports = function (grunt) {
                     yuicompress: true
                 },
                 files: {
-                    "build/angular-widgets.min.css": ["src/less/global.less"]
+                    "release/angular-widgets.min.css": ["src/less/global.less"]
                 }
             }
         },
@@ -223,7 +223,7 @@ module.exports = function (grunt) {
                     // compress: true
                 },
                 files: {
-                    "build/angular-widgets.css": ["src/less/global.styl"]
+                    "release/angular-widgets.css": ["src/less/global.styl"]
                 }
             },
             prod: {
@@ -231,7 +231,7 @@ module.exports = function (grunt) {
                     compress: true
                 },
                 files: {
-                    "build/angular-widgets.min.css": ["src/less/global.styl"]
+                    "release/angular-widgets.min.css": ["src/less/global.styl"]
                 }
             }
         },
