@@ -1,21 +1,30 @@
-function Widget(options) {}
+function WidgetClass(data) {
+    this.id = 'widget-' + id();
+    this._initProperties(data);
+}
 
-Widget.prototype = {
-    prefix: 'widget-',
-    _create: function( options ) {
-        this.id = this.prefix + id();
-        extend(this, options);
-    },
+WidgetClass.prototype._initProperties = function (data) {
+    extend(this, data);
+};
 
-    _initialize: function (scope, element) {
-        this.scope = scope;
-        this.element = element;
-        this._widgetize();
-    },
+WidgetClass.prototype.initialize = function (options) {
+    extend(this, options);
+    this.afterInitialize();
+};
 
-    _widgetize: noop,
+WidgetClass.prototype.widgetize = function () {
+    this._widgetize();
+    this.afterWidgetize();
+};
 
-    data: function (data) {
-        // noop
-    }
+WidgetClass.prototype.afterInitialize = noop;
+WidgetClass.prototype._widgetize = noop;
+WidgetClass.prototype.afterWidgetize = noop;
+
+WidgetClass.prototype.toObject = function () {
+    return {};
+};
+
+WidgetClass.extend = function (data) {
+    extend(WidgetClass.prototype, data);
 };
