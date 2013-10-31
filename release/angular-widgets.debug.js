@@ -2,7 +2,7 @@
 * angular-widgets JavaScript Library
 * Authors: https://github.com/torworx/angular-widgets/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 2013-10-31 11:01
+* Compiled At: 2013-10-31 19:30
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -781,8 +781,9 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
         link: function ($scope, element) {
 
             var $el = $(element);
-            var widget = $scope.widget;
             var $elBody = element.find('.x-body');
+
+            var widget = $scope.widget;
 
             $scope.title = widget.name || widget.settings.name + ' #' + widget.id;
             $scope.view = $sce.trustAsHtml(widget.view);
@@ -848,7 +849,9 @@ function $WidgetsDirective($rootScope, $templateCache, $timeout) {
 
             var defaults = extend({
                 width: 250,
-                height: 210
+                height: 210,
+                cls: 'x-panel-default',
+                selectedCls: 'x-panel-selected'
             }, options.defaults || {});
 
             if (typeof options.widgets === 'string') {
@@ -862,7 +865,8 @@ function $WidgetsDirective($rootScope, $templateCache, $timeout) {
             function update(widgets) {
                 $scope.widgets = widgets;
                 angular.forEach(widgets, function (widget) {
-                    merge(widget, defaults, options.widget);
+                    merge(widget, defaults);
+                    extend(widget, options.widget);
                 });
 
                 $timeout(function () {
@@ -871,7 +875,7 @@ function $WidgetsDirective($rootScope, $templateCache, $timeout) {
             }
             
             $scope.selectWidget = function (widget) {
-                debugWidgetsDirective('selecting widget #' + widget.id);
+                debugWidgetsDirective('selecting widget #' + widget.id, widget);
                 $rootScope.$broadcast(':widgetSelect', widget);
             };
 
@@ -892,7 +896,7 @@ angular.module('widgets.directives').directive('ngwWidgets', $WidgetsDirective);
 angular.module("widgets").run(["$templateCache", function($templateCache) {
 
   $templateCache.put("widget.html",
-    "<div class=\"panel\" ng-class=\"{'panel-default': !selected, 'panel-selected': selected}\">\n" +
+    "<div class=\"panel\" ng-class=\"selected ? widget.selectedCls : widget.cls\">\n" +
     "    <div class=\"x-header panel-heading drag-handle\" ng-click=\"selectWidget(widget)\">\n" +
     "        <h1>{{title}}</h1>\n" +
     "        <span class=\"x-tools pull-right\">\n" +

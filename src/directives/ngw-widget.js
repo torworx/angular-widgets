@@ -8,8 +8,9 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
         link: function ($scope, element) {
 
             var $el = $(element);
-            var widget = $scope.widget;
             var $elBody = element.find('.x-body');
+
+            var widget = $scope.widget;
 
             $scope.title = widget.name || widget.settings.name + ' #' + widget.id;
             $scope.view = $sce.trustAsHtml(widget.view);

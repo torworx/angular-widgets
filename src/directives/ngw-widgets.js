@@ -13,7 +13,9 @@ function $WidgetsDirective($rootScope, $templateCache, $timeout) {
 
             var defaults = extend({
                 width: 250,
-                height: 210
+                height: 210,
+                cls: 'x-panel-default',
+                selectedCls: 'x-panel-selected'
             }, options.defaults || {});
 
             if (typeof options.widgets === 'string') {
@@ -27,7 +29,8 @@ function $WidgetsDirective($rootScope, $templateCache, $timeout) {
             function update(widgets) {
                 $scope.widgets = widgets;
                 angular.forEach(widgets, function (widget) {
-                    merge(widget, defaults, options.widget);
+                    merge(widget, defaults);
+                    extend(widget, options.widget);
                 });
 
                 $timeout(function () {
@@ -36,7 +39,7 @@ function $WidgetsDirective($rootScope, $templateCache, $timeout) {
             }
             
             $scope.selectWidget = function (widget) {
-                debugWidgetsDirective('selecting widget #' + widget.id);
+                debugWidgetsDirective('selecting widget #' + widget.id, widget);
                 $rootScope.$broadcast(':widgetSelect', widget);
             };
 

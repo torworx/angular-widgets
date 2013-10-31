@@ -1,9 +1,13 @@
-panel-variant(border, heading-text-color, heading-bg-color, heading-bordor)
-  border-color border
+panel-variant(border, heading-text-color, heading-bg-color, heading-border, radius = 2px)
+  border none
+  border-radius radius
   & > .panel-heading
     color heading-text-color
     background-color heading-bg-color
+    border 1px solid
     border-color heading-border
+    border-top-left-radius radius
+    border-top-right-radius radius
 
     + .panel-collapse .panel-body
       border-top-color border
@@ -11,6 +15,8 @@ panel-variant(border, heading-text-color, heading-bg-color, heading-bordor)
     & > .dropdown .caret
       border-color heading-text-color transparent
 
+  & > .panel-body
+    border 1px solid border
 
   & > .panel-footer
     + .panel-collapse .panel-body

@@ -128,10 +128,10 @@ module.exports = function (grunt) {
         },
         watch: {
             // Run unit test with karma
-            karma: {
-                files: ['release/angular-widgets.debug.js', 'test/**/*.test.js'],
-                tasks: ['karma:watch:run']
-            },
+//            karma: {
+//                files: ['release/angular-widgets.debug.js', 'test/**/*.test.js'],
+//                tasks: ['karma:watch:run']
+//            },
             // Auto-build angular-widgets.debug.js when source files change
             debug: {
                 files: ['<%= srcFiles %>', '<%= ngtemplates.widgets.src %>'],

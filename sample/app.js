@@ -166,6 +166,9 @@ app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $widgets, s
     $scope.widgets = [];
     $scope.widgetsOptions = {
         widgets: 'widgets',
+        defaults: {
+//            selectedCls: 'panel-primary'
+        },
         widget: {
             tools: [
                 {
