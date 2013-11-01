@@ -136,32 +136,7 @@ app.service('storage', function ($widgets) {
 app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $http, $modal,
                                    $widgets, storage) {
     $widgets.ready.then(function () {
-        // load widgets
-        var widgets = storage.loadWidgets() || (function () {
-            var results = [];
-            angular.forEach(getSampleDevices(), function (device, guid) {
-                var devices = {};
-                devices[guid] = device;
-                results.push($widgets.widget(device.deviceType, {
-                    devices: devices
-                }));
-            });
-            storage.saveWidgets(results);
-            return results;
-        })();
-
-        // load widgets resources
-        var promises = [];
-        angular.forEach(widgets, function (widget) {
-            promises.push(widget.loadResources());
-        });
-
-        $q.all(promises).then(function () {
-            $scope.widgets = widgets;
-            $timeout(function () {
-                loopGenerate($rootScope, widgets, $timeout);
-            });
-        });
+        $scope.loadWidgets();
     });
 
     $scope.widgets = [];
@@ -189,8 +164,38 @@ app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $http, $mod
         }
     };
 
+    $scope.loadWidgets = function () {
+        // load widgets
+        var widgets = storage.loadWidgets() || (function () {
+            var results = [];
+            angular.forEach(getSampleDevices(), function (device, guid) {
+                var devices = {};
+                devices[guid] = device;
+                results.push($widgets.widget(device.deviceType, {
+                    devices: devices
+                }));
+            });
+            storage.saveWidgets(results);
+            return results;
+        })();
+
+        // load widgets resources
+        var promises = [];
+        angular.forEach(widgets, function (widget) {
+            promises.push(widget.loadResources());
+        });
+
+        $q.all(promises).then(function () {
+            $scope.widgets = widgets;
+            $timeout(function () {
+                loopGenerate($rootScope, widgets, $timeout);
+            });
+        });
+    };
+
     $scope.clear = function () {
         storage.clearWidgets();
+        $scope.loadWidgets();
     };
 
     $rootScope.$on(':widgetsReordered', function (event, ids) {

@@ -5,8 +5,6 @@
     <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Angular Widgets Sample</title>
     <link rel="stylesheet" type="text/css" href="../components/bootstrap/dist/css/bootstrap.css"/>
-    <!--<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet">-->
-    <!--<link rel="stylesheet" type="text/css" href="styles.css"/>-->
     <link rel="stylesheet" type="text/css" href="../release/angular-widgets.css"/>
 
     <style type="text/css">
@@ -15,7 +13,7 @@
 </head>
 <body ng-controller="MyCtrl">
 <h2>Widget Area Example</h2>
-<p>This example shows functionality of angular-widgets.If no widgets show, you can <button class="btn btn-default" ng-click="clear()">clear</button> cache then refresh.</p>
+<p>This example shows functionality of angular-widgets.If no widgets show, you can <a style="cursor: pointer" ng-click="clear()">clear</a> cache then refresh.</p>
 
 <div style="padding: 10px; !important">
     <div ngw-widgets="widgetsOptions"></div>
@@ -23,21 +21,22 @@
 
 
 <script src="../components/jquery/jquery.js"></script>
+<script src="../components/lodash/dist/lodash.js"></script>
+<script src="../components/enquire/dist/enquire.js"></script>
+<script src="../components/less.js/dist/less-1.5.0.js"></script>
 
 <script src="../components/angular/angular.js"></script>
 <script src="libs/angular-bootstrap/ui-bootstrap-0.6.0-SNAPSHOT.js"></script>
 <script src="libs/angular-bootstrap/ui-bootstrap-tpls-0.6.0-SNAPSHOT.js"></script>
 
-<script src="../components/less.js/dist/less-1.5.0.js"></script>
 <script src="../components/ccui-foundation/ccui-foundation.js"></script>
 <script src="../components/ccui-draggablly/ccui-draggabilly.js"></script>
 <script src="../components/ccui-packery/ccui-packery.js"></script>
-<script src="../components/enquire/dist/enquire.js"></script>
-<script src="../components/lodash/dist/lodash.js"></script>
 
 <script src="../release/angular-widgets.debug.js"></script>
+
 <script>
-    window.localStorage.debug = "*";
+    if (!window.localStorage.debug) window.localStorage.debug = "*";
 </script>
 
 <script src="app.js"></script>
