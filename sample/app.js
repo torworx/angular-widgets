@@ -51,7 +51,7 @@ function loopGenerate($rootScope, widgets, $timeout) {
     }, 5000);
 }
 
-var app = angular.module('myApp', ['widgets']);
+var app = angular.module('myApp', ['widgets', 'ui.bootstrap']);
 
 app.config(function ($widgetsProvider) {
     var properties = ['devices', 'settings'];
@@ -133,7 +133,8 @@ app.service('storage', function ($widgets) {
 
 });
 
-app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $widgets, storage) {
+app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $http, $modal,
+                                   $widgets, storage) {
     $widgets.ready.then(function () {
         // load widgets
         var widgets = storage.loadWidgets() || (function () {
@@ -172,15 +173,16 @@ app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $widgets, s
         widget: {
             tools: [
                 {
-                    type: 'cog',
-                    handler: function ($event, $widgetScope) {
-                        alert('You clicked settings button!');
-                    }
-                },
-                {
-                    type: 'remove',
-                    handler: function ($event, $widgetScope) {
-                        $widgetScope.deleteWidget();
+                    iconCls: 'glyphicon glyphicon-cog',
+                    handler: function ($event, scope) {
+                        $modal.open({
+                            templateUrl: "settings.html",
+                            scope: scope
+                        }).result.then(function () {
+                                console.log("OK");
+                            }, function () {
+                                console.log("Cancel");
+                            });
                     }
                 }
             ]

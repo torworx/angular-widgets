@@ -1,5 +1,5 @@
 define({
-    name: 'Temperature',
+    name: '温度',
     sizeX: 1,
     sizeY: 1
 },{

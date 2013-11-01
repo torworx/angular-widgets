@@ -8,7 +8,7 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
         link: function ($scope, element) {
 
             var $el = $(element);
-            var $elBody = element.find('.x-body');
+            var $elBody = element.find('.x-panel-body');
 
             var widget = $scope.widget;
 
@@ -24,7 +24,7 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
                 $elBody.addClass(widget.bodyCls);
             }
 
-            $scope.toolClick = function (item, $event) {
+            $scope.toolOnClick = function (item, $event) {
                 if ($event.stopPropagation) $event.stopPropagation();
                 if ($event.preventDefault) $event.preventDefault();
                 if (isFunction(item.handler)) {

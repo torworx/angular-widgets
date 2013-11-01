@@ -1,23 +1,21 @@
-panel-variant(border, heading-text-color, heading-bg-color, heading-border, radius = 2px)
-  border none
+panel-style(border, header-text-color, header-bg-color, header-border, radius = 2px)
+  border-color border
   border-radius radius
-  & > .panel-heading
-    color heading-text-color
-    background-color heading-bg-color
-    border 1px solid
-    border-color heading-border
+  & > .x-panel-header
+    color header-text-color
+    background-color header-bg-color
+    border 1px
+    border-style solid
+    border-color header-border
     border-top-left-radius radius
     border-top-right-radius radius
 
-    + .panel-collapse .panel-body
+    + .x-panel-collapse .x-panel-body
       border-top-color border
 
     & > .dropdown .caret
-      border-color heading-text-color transparent
+      border-color header-text-color transparent
 
-  & > .panel-body
-    border 1px solid border
-
-  & > .panel-footer
-    + .panel-collapse .panel-body
+  & > .x-panel-footer
+    + .x-panel-collapse .x-panel-body
       border-bottom-color border

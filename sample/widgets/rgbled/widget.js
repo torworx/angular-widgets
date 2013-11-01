@@ -3,7 +3,6 @@ define({
     sizeX: 1,
     sizeY: 1
 }, {
-    bodyCls: 'view',
     _widgetize: function() {
         var scope = this.scope;
         var element = this.element;

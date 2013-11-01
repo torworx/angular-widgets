@@ -2,7 +2,7 @@
 * angular-widgets JavaScript Library
 * Authors: https://github.com/torworx/angular-widgets/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 2013-10-31 19:30
+* Compiled At: 2013-11-01 11:05
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -781,7 +781,7 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
         link: function ($scope, element) {
 
             var $el = $(element);
-            var $elBody = element.find('.x-body');
+            var $elBody = element.find('.x-panel-body');
 
             var widget = $scope.widget;
 
@@ -797,7 +797,7 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
                 $elBody.addClass(widget.bodyCls);
             }
 
-            $scope.toolClick = function (item, $event) {
+            $scope.toolOnClick = function (item, $event) {
                 if ($event.stopPropagation) $event.stopPropagation();
                 if ($event.preventDefault) $event.preventDefault();
                 if (isFunction(item.handler)) {
@@ -896,26 +896,26 @@ angular.module('widgets.directives').directive('ngwWidgets', $WidgetsDirective);
 angular.module("widgets").run(["$templateCache", function($templateCache) {
 
   $templateCache.put("widget.html",
-    "<div class=\"panel\" ng-class=\"selected ? widget.selectedCls : widget.cls\">\n" +
-    "    <div class=\"x-header panel-heading drag-handle\" ng-click=\"selectWidget(widget)\">\n" +
+    "<div class=\"x-panel\" ng-class=\"selected ? widget.selectedCls : widget.cls\">\n" +
+    "    <div class=\"x-panel-header drag-handle\" ng-click=\"selectWidget(widget)\">\n" +
     "        <h1>{{title}}</h1>\n" +
-    "        <span class=\"x-tools pull-right\">\n" +
-    "            <span class=\"glyphicon\"\n" +
-    "                  ng-class=\"tool.type ? 'glyphicon-' + tool.type : ''\"\n" +
-    "                  ng-click=\"toolClick(tool, $event)\"\n" +
+    "        <div class=\"x-tools x-pull-right\">\n" +
+    "            <span class=\"x-tool\"\n" +
+    "                  ng-class=\"tool.iconCls || ''\"\n" +
+    "                  ng-click=\"toolOnClick(tool, $event)\"\n" +
     "                  ng-repeat=\"tool in widget.tools\">\n" +
     "            </span>\n" +
     "\n" +
-    "        </span>\n" +
+    "        </div>\n" +
     "    </div>\n" +
-    "    <div class=\"panel-body x-body\" ng-bind-html=\"view\"></div>\n" +
+    "    <div class=\"x-panel-body\" ng-bind-html=\"view\"></div>\n" +
     "    <style type=\"text/css\" ng-bind-html=\"style\"></style>\n" +
     "</div>\n" +
     "\n"
   );
 
   $templateCache.put("widgets.html",
-    "<section id=\"widgets-container\" class=\"x-widgets-container meticulous\">\n" +
+    "<section id=\"widgets-container\" class=\"x-widgets-container meticulous clearfix\">\n" +
     "    <div ngw-packery=\".x-widget\" class=\"widgets packery\">\n" +
     "        <div class=\"x-widget\" ngw-widget ngw-draggabilly ngw-sizable ng-repeat=\"widget in widgets\"></div>\n" +
     "    </div>\n" +
