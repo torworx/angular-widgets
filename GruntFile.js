@@ -5,7 +5,9 @@ module.exports = function (grunt) {
 
     var stripBanner = function (src, options) {
 
-        if (!options) { options = {}; }
+        if (!options) {
+            options = {};
+        }
         var m = [];
         if (options.line) {
             // Strip // ... leading banners.
@@ -35,8 +37,12 @@ module.exports = function (grunt) {
             process: false
         });
         // Normalize boolean options that accept options objects.
-        if (typeof options.stripBanners === 'boolean' && options.stripBanners === true) { options.stripBanners = {}; }
-        if (typeof options.process === 'boolean' && options.process === true) { options.process = {}; }
+        if (typeof options.stripBanners === 'boolean' && options.stripBanners === true) {
+            options.stripBanners = {};
+        }
+        if (typeof options.process === 'boolean' && options.process === true) {
+            options.process = {};
+        }
 
         // Process banner and footer.
         var banner = grunt.template.process(options.banner);
@@ -78,9 +84,10 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        templates: [
+        srcTemplates: [
             'src/templates/**.html'
         ],
+        destTemplates: 'release/templates.js',
         srcFiles: [
             'src/*.js',
 //            'src/filters/*.js',
@@ -89,7 +96,7 @@ module.exports = function (grunt) {
 
             'src/directives/*.js',
 //            'src/i18n/*.js',
-            '<%= ngtemplates.widgets.dest %>'
+            '<%= destTemplates %>'
         ],
         testFiles: { //unit & e2e goes here
             karmaUnit: 'config/karma.conf.js'
@@ -134,7 +141,7 @@ module.exports = function (grunt) {
 //            },
             // Auto-build angular-widgets.debug.js when source files change
             debug: {
-                files: ['<%= srcFiles %>', '<%= ngtemplates.widgets.src %>'],
+                files: ['<%= srcFiles %>', '<%= srcTemplates %>'],
                 tasks: ['debug']
             },
             less: {
@@ -147,10 +154,10 @@ module.exports = function (grunt) {
             }
         },
         ngtemplates: {
-            widgets: {
+            "ng.widgets": {
                 options: { base: 'src/templates' },
-                src: ['src/templates/**.html'],
-                dest: 'release/templates.js'
+                src: '<%= srcTemplates %>',
+                dest: '<%= destTemplates %>'
             }
         },
         concat: {
@@ -196,7 +203,7 @@ module.exports = function (grunt) {
         },
         clean: {
             templates: {
-                src: ["<%= ngtemplates.widgets.dest %>"]
+                src: ['<%= destTemplates %>']
             }
         },
         less: {
@@ -319,7 +326,7 @@ module.exports = function (grunt) {
     grunt.registerTask('build', ['ngtemplates', 'concat:debug', 'concat:prod', 'uglify:build', 'stylus', 'clean']);
 
     // Default task(s).
-    grunt.registerTask('default', 'No default task', function() {
+    grunt.registerTask('default', 'No default task', function () {
         grunt.log.write('Use "grunt build" to build');
     });
 

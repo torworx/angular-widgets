@@ -50,6 +50,6 @@ function ancestors(first, second) {
     return path;
 }
 
-angular.module('widgets.directives', []);
-angular.module('widgets.services', []);
-angular.module('widgets', ['widgets.directives', 'widgets.services']);
+angular.module('ng.widgets.directives', []);
+angular.module('ng.widgets.services', []);
+angular.module('ng.widgets', ['ng.widgets.directives', 'ng.widgets.services']);

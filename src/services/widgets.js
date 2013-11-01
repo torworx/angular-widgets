@@ -174,4 +174,4 @@ function $WidgetsProvider() {
     }
 }
 
-angular.module('widgets.services').provider('$widgets', $WidgetsProvider);
+angular.module('ng.widgets.services').provider('$widgets', $WidgetsProvider);

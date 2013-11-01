@@ -51,7 +51,7 @@ function loopGenerate($rootScope, widgets, $timeout) {
     }, 5000);
 }
 
-var app = angular.module('myApp', ['widgets', 'ui.bootstrap']);
+var app = angular.module('myApp', ['ng.widgets', 'ui.bootstrap']);
 
 app.config(function ($widgetsProvider) {
     var properties = ['devices', 'settings'];

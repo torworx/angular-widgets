@@ -60,4 +60,4 @@ function $DraggabillyDirective($rootScope) {
     }
 }
 
-angular.module('widgets.directives').directive('ngwDraggabilly', $DraggabillyDirective);
+angular.module('ng.widgets.directives').directive('ngwDraggabilly', $DraggabillyDirective);

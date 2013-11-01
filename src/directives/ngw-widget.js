@@ -60,4 +60,4 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
     };
 }
 
-angular.module('widgets.directives').directive('ngwWidget', $WidgetDirective);
+angular.module('ng.widgets.directives').directive('ngwWidget', $WidgetDirective);

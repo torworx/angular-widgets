@@ -2,7 +2,7 @@
 * angular-widgets JavaScript Library
 * Authors: https://github.com/torworx/angular-widgets/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 2013-11-01 11:05
+* Compiled At: 2013-11-01 22:22
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -151,9 +151,9 @@ function ancestors(first, second) {
     return path;
 }
 
-angular.module('widgets.directives', []);
-angular.module('widgets.services', []);
-angular.module('widgets', ['widgets.directives', 'widgets.services']);
+angular.module('ng.widgets.directives', []);
+angular.module('ng.widgets.services', []);
+angular.module('ng.widgets', ['ng.widgets.directives', 'ng.widgets.services']);
 /**
  * Create a debugger with the given `name`.
  *
@@ -493,7 +493,7 @@ function $WidgetsProvider() {
     }
 }
 
-angular.module('widgets.services').provider('$widgets', $WidgetsProvider);
+angular.module('ng.widgets.services').provider('$widgets', $WidgetsProvider);
 function WidgetClass(data) {
     this.id = 'widget-' + id();
     this._initProperties(data);
@@ -586,7 +586,7 @@ function $DraggabillyDirective($rootScope) {
     }
 }
 
-angular.module('widgets.directives').directive('ngwDraggabilly', $DraggabillyDirective);
+angular.module('ng.widgets.directives').directive('ngwDraggabilly', $DraggabillyDirective);
 $PackeryDirective.$inject = ['$rootScope', '$timeout'];
 function $PackeryDirective($rootScope, $timeout) {
 
@@ -746,7 +746,7 @@ function $PackeryDirective($rootScope, $timeout) {
     }
 }
 
-angular.module('widgets.directives').directive('ngwPackery', $PackeryDirective);
+angular.module('ng.widgets.directives').directive('ngwPackery', $PackeryDirective);
 $SizableDirective.$inject = ['$rootScope'];
 function $SizableDirective($rootScope) {
 
@@ -770,7 +770,7 @@ function $SizableDirective($rootScope) {
         }
     }
 }
-angular.module('widgets.directives').directive('ngwSizable', $SizableDirective);
+angular.module('ng.widgets.directives').directive('ngwSizable', $SizableDirective);
 $WidgetDirective.$inject = ['$rootScope', '$templateCache', '$sce', '$timeout'];
 function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
 
@@ -833,7 +833,7 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
     };
 }
 
-angular.module('widgets.directives').directive('ngwWidget', $WidgetDirective);
+angular.module('ng.widgets.directives').directive('ngwWidget', $WidgetDirective);
 $WidgetsDirective.$inject = ['$rootScope', '$templateCache', '$timeout'];
 function $WidgetsDirective($rootScope, $templateCache, $timeout) {
     var debugWidgetsDirective = debug('ngw:widgets-directive')
@@ -892,8 +892,8 @@ function $WidgetsDirective($rootScope, $templateCache, $timeout) {
     };
 }
 
-angular.module('widgets.directives').directive('ngwWidgets', $WidgetsDirective);
-angular.module("widgets").run(["$templateCache", function($templateCache) {
+angular.module('ng.widgets.directives').directive('ngwWidgets', $WidgetsDirective);
+angular.module("ng.widgets").run(["$templateCache", function($templateCache) {
 
   $templateCache.put("widget.html",
     "<div class=\"x-panel\" ng-class=\"selected ? widget.selectedCls : widget.cls\">\n" +

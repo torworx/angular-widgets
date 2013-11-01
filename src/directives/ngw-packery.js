@@ -157,4 +157,4 @@ function $PackeryDirective($rootScope, $timeout) {
     }
 }
 
-angular.module('widgets.directives').directive('ngwPackery', $PackeryDirective);
+angular.module('ng.widgets.directives').directive('ngwPackery', $PackeryDirective);

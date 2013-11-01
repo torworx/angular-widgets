@@ -21,4 +21,4 @@ function $SizableDirective($rootScope) {
         }
     }
 }
-angular.module('widgets.directives').directive('ngwSizable', $SizableDirective);
+angular.module('ng.widgets.directives').directive('ngwSizable', $SizableDirective);
