@@ -12,7 +12,7 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
 
             var widget = $scope.widget;
 
-            $scope.title = widget.name || widget.settings.name + ' #' + widget.id;
+            $scope.title = widget.name || widget.settings.name;
             $scope.view = $sce.trustAsHtml(widget.view);
             $scope.style = $sce.trustAsHtml(widget.style);
 

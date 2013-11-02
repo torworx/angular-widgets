@@ -2,7 +2,7 @@
 * angular-widgets JavaScript Library
 * Authors: https://github.com/torworx/angular-widgets/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 2013-11-02 16:18
+* Compiled At: 2013-11-02 23:44
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -695,7 +695,7 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
 
             var widget = $scope.widget;
 
-            $scope.title = widget.name || widget.settings.name + ' #' + widget.id;
+            $scope.title = widget.name || widget.settings.name;
             $scope.view = $sce.trustAsHtml(widget.view);
             $scope.style = $sce.trustAsHtml(widget.style);
 
