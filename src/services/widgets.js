@@ -120,6 +120,34 @@ function $WidgetsProvider() {
         return $q.all(promises);
     }
 
+    this.pack = pack;
+    function pack(widgets) {
+        if (!widgets) return null;
+        if (!isArray(widgets)) widgets = [widgets];
+        var results = [];
+        forEach(widgets, function (widget) {
+            this.push({
+                type: widget.constructor.widgetName,
+                data: widget.toObject()
+            });
+        }, results);
+        return results;
+    }
+
+    this.unpack = unpack;
+    function unpack(items) {
+        if (!items) return null;
+        if (!isArray(items)) items = [items];
+        var results = [];
+        forEach(items, function (item) {
+            var Widget = definitionsMap[item.type];
+            if (!Widget) return console.error('Unknown widget: ' + item.type);
+            return this.push(new Widget(item.data));
+        }, results);
+        return results;
+    }
+
+
     this.$get = $get;
     $get.$inject = ['$q', '$http'];
     function $get($q, $http) {
@@ -147,29 +175,8 @@ function $WidgetsProvider() {
                 }
                 return new Widget(data);
             },
-            pack: function (widgets) {
-                if (!widgets) return null;
-                if (!isArray(widgets)) widgets = [widgets];
-                var results = [];
-                forEach(widgets, function (widget) {
-                    this.push({
-                        type: widget.constructor.widgetName,
-                        data: widget.toObject()
-                    });
-                }, results);
-                return results;
-            },
-            unpack: function (items) {
-                if (!items) return null;
-                if (!isArray(items)) items = [items];
-                var results = [];
-                forEach(items, function (item) {
-                    var Widget = definitionsMap[item.type];
-                    if (!Widget) return console.error('Unknown widget: ' + item.type);
-                    return this.push(new Widget(item.data));
-                }, results);
-                return results;
-            }
+            pack: pack,
+            unpack: unpack
         }
     }
 }
