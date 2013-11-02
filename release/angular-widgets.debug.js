@@ -2,7 +2,7 @@
 * angular-widgets JavaScript Library
 * Authors: https://github.com/torworx/angular-widgets/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 2013-11-02 16:06
+* Compiled At: 2013-11-02 16:18
 ***********************************************/
 (function(window, $) {
 'use strict';
