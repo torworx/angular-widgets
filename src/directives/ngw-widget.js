@@ -1,5 +1,5 @@
-$WidgetDirective.$inject = ['$rootScope', '$templateCache', '$sce', '$timeout'];
-function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
+$WidgetDirective.$inject = ['$rootScope', '$templateCache', '$sce', '$compile', '$timeout'];
+function $WidgetDirective($rootScope, $templateCache, $sce, $compile, $timeout) {
 
     return {
         template: $templateCache.get('widget.html'),
@@ -8,12 +8,11 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
         link: function ($scope, element) {
 
             var $el = $(element);
-            var $elBody = element.find('.x-panel-body');
+            var $elBody = element.find('.x-widget-body');
 
             var widget = $scope.widget;
 
             $scope.title = widget.name || widget.settings.name;
-            $scope.view = $sce.trustAsHtml(widget.view);
             $scope.style = $sce.trustAsHtml(widget.style);
 
             $el.attr('id', widget.id);
@@ -23,6 +22,30 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
             if (widget.bodyCls) {
                 $elBody.addClass(widget.bodyCls);
             }
+
+            $scope.updateBodyHTML = function () {
+                $elBody.empty();
+                $scope.HTML = widget.view;
+                var el;
+                try {
+                    el = angular.element($scope.HTML);
+                } catch (e) {
+                    el = angular.element("<div>" + $scope.HTML + "</div>");
+                }
+                $elBody.html($compile(el)($scope));
+            };
+
+            $scope.run = function () {
+                try {
+                    widget.run({
+                        scope: $scope,
+                        element: $elBody,
+                        $timeout: $timeout
+                    });
+                } catch (e) {
+                    alert(e);
+                }
+            };
 
             $scope.toolOnClick = function (item, $event) {
                 if ($event.stopPropagation) $event.stopPropagation();
@@ -36,15 +59,6 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
                 $scope.$parent.deleteWidget(widget);
             };
 
-            $timeout(function () {
-                widget.initialize({
-                    scope: $scope,
-                    element: $elBody,
-                    $timeout: $timeout
-                });
-                widget.widgetize();
-            });
-
             /**
              * Select a Widget
              */
@@ -55,6 +69,12 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
                     $scope.selected = !$scope.selected;
                     $rootScope.$broadcast($scope.selected ? ":widgetSelected" : ":widgetDeselected", widget);
                 }
+            });
+
+            $timeout(function () {
+                $scope.updateBodyHTML();
+                $scope.run();
+                $scope.$apply();
             });
         }
     };

@@ -7,18 +7,15 @@ WidgetClass.prototype._initProperties = function (data) {
     extend(this, data);
 };
 
-WidgetClass.prototype.initialize = function (options) {
+WidgetClass.prototype.run = function (options) {
     extend(this, options);
-    this.afterInitialize();
-};
-
-WidgetClass.prototype.widgetize = function () {
-    this._widgetize();
+    this.beforeWidgetize();
+    this.widgetize();
     this.afterWidgetize();
 };
 
-WidgetClass.prototype.afterInitialize = noop;
-WidgetClass.prototype._widgetize = noop;
+WidgetClass.prototype.beforeWidgetize = noop;
+WidgetClass.prototype.widgetize = noop;
 WidgetClass.prototype.afterWidgetize = noop;
 
 WidgetClass.prototype.toObject = function () {

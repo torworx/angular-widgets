@@ -60,7 +60,7 @@ app.config(function ($widgetsProvider) {
             return _.pick(this, properties);
         },
 
-        afterInitialize: function () {
+        beforeWidgetize: function () {
             var self = this;
             this.scope.$on(':data', function (event, data) {
                 if (self.devices.hasOwnProperty(data.GUID)) {
@@ -180,12 +180,7 @@ app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $http, $mod
         })();
 
         // load widgets resources
-        var promises = [];
-        angular.forEach(widgets, function (widget) {
-            promises.push(widget.loadResources());
-        });
-
-        $q.all(promises).then(function () {
+        $widgets.loadResources(widgets).then(function () {
             $scope.widgets = widgets;
             $timeout(function () {
                 loopGenerate($rootScope, widgets, $timeout);

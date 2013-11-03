@@ -3,7 +3,7 @@ define({
     sizeX: 1,
     sizeY: 1
 },{
-    _widgetize: function() {
+    widgetize: function() {
         var element = this.element;
         var temperature = element.find(".my_temperature .value");
 

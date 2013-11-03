@@ -2,7 +2,7 @@
 * angular-widgets JavaScript Library
 * Authors: https://github.com/torworx/angular-widgets/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 2013-11-02 23:44
+* Compiled At: 2013-11-03 20:45
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -223,27 +223,62 @@ if (window.localStorage) debug.enable(localStorage.debug);
 function Resources($q, $http) {
 
     var debugResources = debug('ngw:resources');
-    this.load = function (object, prop, resName) {
-        var d, p,
-            data = object[prop],
-            dataUrl = object[prop + 'Url'];
-        if (object.location) {
-            dataUrl = object.location + '/' + (dataUrl || resName);
-        }
-
-        if (data) {
-            p = $q.when(data);
-        } else if (dataUrl) {
 
 
-            d = $q.defer();
-            debugResources('loading resource "' + prop + '" from ' + dataUrl);
-            $http.get(dataUrl).then(function (result) {
-                d.resolve(result.data);
+    function loadResource(location, file) {
+        var dataUrl = location + '/' + file;
+
+        debugResources('loading resource "' + file + '" from ' + dataUrl);
+
+        var d = $q.defer();
+        $http.get(dataUrl).then(function (result) {
+            d.resolve(result.data);
+        });
+        return d.promise;
+    }
+    this.load = function (location, resources) {
+        var props = [];
+        var promises = [];
+        forEach(resources, function (file, prop) {
+            props.push(prop);
+            promises.push(loadResource(location, file));
+        });
+        return $q.all(promises).then(function (resources) {
+            var results = {};
+            forEach(resources, function (res, index) {
+                results[props[index]] = res;
             });
-            p = d.promise;
+            return results;
+        });
+    };
+
+    var assetsCompiler = new AssetsCompiler();
+    this.loadViewAndStyle = function (widget) {
+        return this.load(widget.location, { view: 'view.html', style: 'style.less' })
+            .then(function (results) {
+                var d = $q.defer();
+                compileStyle(widget.id, results.style).then(function (compiledCode) {
+                    results.style = compiledCode;
+                    d.resolve(results);
+                });
+                return d.promise;
+            })
+            .then(function (results) {
+                extend(widget, results);
+            });
+
+
+        function compileStyle(id, source) {
+            var d = $q.defer();
+            assetsCompiler.compile('less', '#' + id + ' { ' + source + ' }', function (err, compiledCode) {
+                if (err) {
+                    console.error(err);
+                }
+                d.resolve(compiledCode);
+            });
+            return d.promise;
         }
-        return p || $q.when();
+
     };
 }
 
@@ -320,45 +355,6 @@ function $WidgetsProvider() {
         });
     };
 
-    var assetsCompiler = new AssetsCompiler();
-
-    function loadResourcesFn(resources, $q) {
-        return function () {
-            var self = this;
-            if (!self._resready) {
-                var promises = [];
-                promises.push(resources.load(self, 'view', 'view.html')
-                    .then(assignResource(self, 'view')));
-
-                promises.push(resources.load(self, 'style', 'style.less')
-                    .then(compileStyles(self.id))
-                    .then(assignResource(self, 'style')));
-
-                self._resready = $q.all(promises);
-            }
-            return self._resready;
-        };
-
-        function compileStyles(id) {
-            return function (source) {
-                var d = $q.defer();
-                assetsCompiler.compile('less', '#' + id + ' { ' + source + ' }', function (err, compiledCode) {
-                    if (err) {
-                        console.error(err);
-                    }
-                    d.resolve(compiledCode);
-                });
-                return d.promise;
-            }
-        }
-
-        function assignResource(object, prop) {
-            return function (source) {
-                object[prop] = source;
-            }
-        }
-    }
-
     function flush($q, $http) {
         var promises = [];
         forEach(queue, function (fn) {
@@ -399,12 +395,10 @@ function $WidgetsProvider() {
     $get.$inject = ['$q', '$http'];
     function $get($q, $http) {
         var resources = new Resources($q, $http);
-        var loadResources = loadResourcesFn(resources, $q);
 
         var promise = flush($q, $http).then(function (results) {
             forEach(results, function (clazz) {
                 if (!clazz) return;
-                clazz.prototype.loadResources = loadResources;
                 definitions.push(clazz);
                 definitionsMap[clazz.widgetName] = clazz;
             });
@@ -422,6 +416,16 @@ function $WidgetsProvider() {
                 }
                 return new Widget(data);
             },
+            loadResources: function (widgets) {
+                if (!isArray(widgets)) widgets = [widgets];
+                var promises = [];
+                forEach(widgets, function (widget) {
+                    promises.push(resources.loadViewAndStyle(widget));
+                });
+                return $q.all(promises).then(function () {
+                    return widgets;
+                });
+            },
             pack: pack,
             unpack: unpack
         }
@@ -438,18 +442,15 @@ WidgetClass.prototype._initProperties = function (data) {
     extend(this, data);
 };
 
-WidgetClass.prototype.initialize = function (options) {
+WidgetClass.prototype.run = function (options) {
     extend(this, options);
-    this.afterInitialize();
-};
-
-WidgetClass.prototype.widgetize = function () {
-    this._widgetize();
+    this.beforeWidgetize();
+    this.widgetize();
     this.afterWidgetize();
 };
 
-WidgetClass.prototype.afterInitialize = noop;
-WidgetClass.prototype._widgetize = noop;
+WidgetClass.prototype.beforeWidgetize = noop;
+WidgetClass.prototype.widgetize = noop;
 WidgetClass.prototype.afterWidgetize = noop;
 
 WidgetClass.prototype.toObject = function () {
@@ -681,8 +682,8 @@ function $SizableDirective($rootScope) {
     }
 }
 angular.module('ng.widgets.directives').directive('ngwSizable', $SizableDirective);
-$WidgetDirective.$inject = ['$rootScope', '$templateCache', '$sce', '$timeout'];
-function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
+$WidgetDirective.$inject = ['$rootScope', '$templateCache', '$sce', '$compile', '$timeout'];
+function $WidgetDirective($rootScope, $templateCache, $sce, $compile, $timeout) {
 
     return {
         template: $templateCache.get('widget.html'),
@@ -691,12 +692,11 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
         link: function ($scope, element) {
 
             var $el = $(element);
-            var $elBody = element.find('.x-panel-body');
+            var $elBody = element.find('.x-widget-body');
 
             var widget = $scope.widget;
 
             $scope.title = widget.name || widget.settings.name;
-            $scope.view = $sce.trustAsHtml(widget.view);
             $scope.style = $sce.trustAsHtml(widget.style);
 
             $el.attr('id', widget.id);
@@ -706,6 +706,30 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
             if (widget.bodyCls) {
                 $elBody.addClass(widget.bodyCls);
             }
+
+            $scope.updateBodyHTML = function () {
+                $elBody.empty();
+                $scope.HTML = widget.view;
+                var el;
+                try {
+                    el = angular.element($scope.HTML);
+                } catch (e) {
+                    el = angular.element("<div>" + $scope.HTML + "</div>");
+                }
+                $elBody.html($compile(el)($scope));
+            };
+
+            $scope.run = function () {
+                try {
+                    widget.run({
+                        scope: $scope,
+                        element: $elBody,
+                        $timeout: $timeout
+                    });
+                } catch (e) {
+                    alert(e);
+                }
+            };
 
             $scope.toolOnClick = function (item, $event) {
                 if ($event.stopPropagation) $event.stopPropagation();
@@ -718,15 +742,6 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
             $scope.deleteWidget = function () {
                 $scope.$parent.deleteWidget(widget);
             };
-
-            $timeout(function () {
-                widget.initialize({
-                    scope: $scope,
-                    element: $elBody,
-                    $timeout: $timeout
-                });
-                widget.widgetize();
-            });
             $scope.$on(":widgetSelect", function (event, widget) {
                 $scope.selected = false;
 
@@ -734,6 +749,12 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $timeout) {
                     $scope.selected = !$scope.selected;
                     $rootScope.$broadcast($scope.selected ? ":widgetSelected" : ":widgetDeselected", widget);
                 }
+            });
+
+            $timeout(function () {
+                $scope.updateBodyHTML();
+                $scope.run();
+                $scope.$apply();
             });
         }
     };
@@ -802,7 +823,7 @@ angular.module("ng.widgets").run(["$templateCache", function($templateCache) {
 
   $templateCache.put("widget.html",
     "<div class=\"x-panel\" ng-class=\"selected ? widget.selectedCls : widget.cls\">\n" +
-    "    <div class=\"x-panel-header drag-handle\" ng-click=\"selectWidget(widget)\">\n" +
+    "    <div class=\"x-widget-header x-panel-header drag-handle\" ng-click=\"selectWidget(widget)\">\n" +
     "        <h1>{{title}}</h1>\n" +
     "        <div class=\"x-tools x-pull-right\">\n" +
     "            <span class=\"x-tool\"\n" +
@@ -813,7 +834,7 @@ angular.module("ng.widgets").run(["$templateCache", function($templateCache) {
     "\n" +
     "        </div>\n" +
     "    </div>\n" +
-    "    <div class=\"x-panel-body\" ng-bind-html=\"view\"></div>\n" +
+    "    <div class=\"x-widget-body x-panel-body\" ng-bind-html=\"view\"></div>\n" +
     "    <style type=\"text/css\" ng-bind-html=\"style\"></style>\n" +
     "</div>\n" +
     "\n"

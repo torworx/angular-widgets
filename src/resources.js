@@ -2,42 +2,75 @@ function Resources($q, $http) {
 
     var debugResources = debug('ngw:resources');
 
+
+    function loadResource(location, file) {
+        var dataUrl = location + '/' + file;
+
+        debugResources('loading resource "' + file + '" from ' + dataUrl);
+
+        var d = $q.defer();
+        $http.get(dataUrl).then(function (result) {
+            d.resolve(result.data);
+        });
+        return d.promise;
+    }
+
     /**
      *
-     * @param object
-     * @param prop
-     * @param resName
-     * @returns {*|Promise}
+     * @param location
+     * @param resources
+     *  {
+     *      view: 'view.html',
+     *      style: 'style.less'
+     *  }
+     * @returns {*} promise
+     *  {
+     *      view: ...,
+     *      style: ...
+     *  }
      */
-    this.load = function (object, prop, resName) {
-        var d, p,
-            data = object[prop],
-            dataUrl = object[prop + 'Url'];
-        if (object.location) {
-            dataUrl = object.location + '/' + (dataUrl || resName);
-        }
-
-        if (data) {
-            p = $q.when(data);
-        } else if (dataUrl) {
-//            var i = dataUrl.lastIndexOf('.');
-//            var extension = i < 0 ? '' : dataUrl.substring(i + 1);
-            d = $q.defer();
-            debugResources('loading resource "' + prop + '" from ' + dataUrl);
-            $http.get(dataUrl).then(function (result) {
-                d.resolve(result.data);
-//                var source = intercept ? intercept(extension, result.data) : result.data;
-//                if (assetsCompiler.hasCompiler(extension)) {
-//                    assetsCompiler.compile(extension, source, function (err, compiledCode) {
-//                        d.resolve(compiledCode);
-//                    });
-//                } else {
-//                    d.resolve(source);
-//                }
-
+    this.load = function (location, resources) {
+        var props = [];
+        var promises = [];
+        forEach(resources, function (file, prop) {
+            props.push(prop);
+            promises.push(loadResource(location, file));
+        });
+        return $q.all(promises).then(function (resources) {
+            var results = {};
+            forEach(resources, function (res, index) {
+                results[props[index]] = res;
             });
-            p = d.promise;
+            return results;
+        });
+    };
+
+    var assetsCompiler = new AssetsCompiler();
+    this.loadViewAndStyle = function (widget) {
+        return this.load(widget.location, { view: 'view.html', style: 'style.less' })
+            .then(function (results) {
+                var d = $q.defer();
+                compileStyle(widget.id, results.style).then(function (compiledCode) {
+                    results.style = compiledCode;
+                    d.resolve(results);
+                });
+                return d.promise;
+            })
+            .then(function (results) {
+                extend(widget, results);
+            });
+
+
+        function compileStyle(id, source) {
+            var d = $q.defer();
+            assetsCompiler.compile('less', '#' + id + ' { ' + source + ' }', function (err, compiledCode) {
+                if (err) {
+                    console.error(err);
+                }
+                d.resolve(compiledCode);
+            });
+            return d.promise;
         }
-        return p || $q.when();
+
     };
 }

@@ -1,5 +1,5 @@
 <div class="x-panel" ng-class="selected ? widget.selectedCls : widget.cls">
-    <div class="x-panel-header drag-handle" ng-click="selectWidget(widget)">
+    <div class="x-widget-header x-panel-header drag-handle" ng-click="selectWidget(widget)">
         <h1>{{title}}</h1>
         <div class="x-tools x-pull-right">
             <span class="x-tool"
@@ -10,7 +10,7 @@
 
         </div>
     </div>
-    <div class="x-panel-body" ng-bind-html="view"></div>
+    <div class="x-widget-body x-panel-body" ng-bind-html="view"></div>
     <style type="text/css" ng-bind-html="style"></style>
 </div>
 

@@ -3,7 +3,7 @@ define({
     sizeX: 1,
     sizeY: 1
 }, {
-    _widgetize: function() {
+    widgetize: function() {
         var scope = this.scope;
         var element = this.element;
 
