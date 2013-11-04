@@ -7,7 +7,7 @@ describe('services', function () {
             helper,
             Local, Remote;
 
-        beforeEach(module('widgets', function ($widgetsProvider) {
+        beforeEach(module('ng.widgets', function ($widgetsProvider) {
             $widgetsProvider.define('local', {name: 'Local'});
             $widgetsProvider.load('remote', '/remote');
         }));
@@ -71,7 +71,7 @@ describe('services', function () {
             expect(widget.view).toBeUndefined();
             expect(widget.style).toBeUndefined();
 
-            promise = widget.loadResources();
+            promise = $widgets.loadResources(widget);
             expect(promise).toBeTruthy();
             $httpBackend.flush();
 
