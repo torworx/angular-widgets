@@ -2,7 +2,7 @@
 * angular-widgets JavaScript Library
 * Authors: https://github.com/torworx/angular-widgets/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 2013-11-03 20:45
+* Compiled At: 2013-11-04 10:12
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -353,7 +353,8 @@ function Resources($q, $http) {
 function $WidgetsProvider() {
 
     var debugWidgets = debug('ngw:widgets-service');
-    var queue = [],
+    var service = {},
+        queue = [],
         definitions = [],
         definitionsMap = {};
 
@@ -460,6 +461,9 @@ function $WidgetsProvider() {
         return results;
     }
 
+    this.extend = function (object) {
+        extend(service, object);
+    };
 
     this.$get = $get;
     $get.$inject = ['$q', '$http'];
@@ -476,7 +480,7 @@ function $WidgetsProvider() {
             console.err('widgets load failed: ' + reason);
         });
 
-        return {
+        extend(service, {
             ready: promise,
             definitions: definitions,
             widget: function (name, data) {
@@ -498,7 +502,9 @@ function $WidgetsProvider() {
             },
             pack: pack,
             unpack: unpack
-        }
+        });
+
+        return service;
     }
 }
 
@@ -790,12 +796,9 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $compile, $timeout) 
             var $elBody = element.find('.x-widget-body');
 
             var widget = $scope.widget;
-
-            $scope.title = widget.name || widget.settings.name;
             $scope.style = $sce.trustAsHtml(widget.style);
 
             $el.attr('id', widget.id);
-
             $el.width(widget.width);
             $el.height(widget.height);
             if (widget.bodyCls) {
@@ -815,15 +818,11 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $compile, $timeout) 
             };
 
             $scope.run = function () {
-                try {
-                    widget.run({
-                        scope: $scope,
-                        element: $elBody,
-                        $timeout: $timeout
-                    });
-                } catch (e) {
-                    alert(e);
-                }
+                widget.run({
+                    scope: $scope,
+                    element: $elBody,
+                    $timeout: $timeout
+                });
             };
 
             $scope.toolOnClick = function (item, $event) {
@@ -924,7 +923,7 @@ angular.module("ng.widgets").run(["$templateCache", function($templateCache) {
   $templateCache.put("widget.html",
     "<div class=\"x-panel\" ng-class=\"selected ? widget.selectedCls : widget.cls\">\n" +
     "    <div class=\"x-widget-header x-panel-header drag-handle\" ng-click=\"selectWidget(widget)\">\n" +
-    "        <h1>{{title}}</h1>\n" +
+    "        <h1>{{widget.settings.name}}</h1>\n" +
     "        <div class=\"x-tools x-pull-right\">\n" +
     "            <span class=\"x-tool\"\n" +
     "                  ng-class=\"tool.iconCls || ''\"\n" +

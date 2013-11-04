@@ -11,12 +11,9 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $compile, $timeout) 
             var $elBody = element.find('.x-widget-body');
 
             var widget = $scope.widget;
-
-            $scope.title = widget.name || widget.settings.name;
             $scope.style = $sce.trustAsHtml(widget.style);
 
             $el.attr('id', widget.id);
-
             $el.width(widget.width);
             $el.height(widget.height);
             if (widget.bodyCls) {
@@ -36,15 +33,11 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $compile, $timeout) 
             };
 
             $scope.run = function () {
-                try {
-                    widget.run({
-                        scope: $scope,
-                        element: $elBody,
-                        $timeout: $timeout
-                    });
-                } catch (e) {
-                    alert(e);
-                }
+                widget.run({
+                    scope: $scope,
+                    element: $elBody,
+                    $timeout: $timeout
+                });
             };
 
             $scope.toolOnClick = function (item, $event) {

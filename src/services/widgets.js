@@ -1,7 +1,8 @@
 function $WidgetsProvider() {
 
     var debugWidgets = debug('ngw:widgets-service');
-    var queue = [],
+    var service = {},
+        queue = [],
         definitions = [],
         definitionsMap = {};
 
@@ -108,6 +109,9 @@ function $WidgetsProvider() {
         return results;
     }
 
+    this.extend = function (object) {
+        extend(service, object);
+    };
 
     this.$get = $get;
     $get.$inject = ['$q', '$http'];
@@ -124,7 +128,7 @@ function $WidgetsProvider() {
             console.err('widgets load failed: ' + reason);
         });
 
-        return {
+        extend(service, {
             ready: promise,
             definitions: definitions,
             widget: function (name, data) {
@@ -146,7 +150,9 @@ function $WidgetsProvider() {
             },
             pack: pack,
             unpack: unpack
-        }
+        });
+
+        return service;
     }
 }
 
