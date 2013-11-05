@@ -20,6 +20,7 @@ function $WidgetsProvider() {
             }
 
             WidgetClass.call(this, data);
+            this.widgetName = name;
             return this;
         };
 
@@ -132,6 +133,11 @@ function $WidgetsProvider() {
             ready: promise,
             definitions: definitions,
             widget: function (name, data) {
+                if (!data) {
+                    data = name;
+                    name = data.widgetName;
+                }
+                if (!name) throw new Error('Invalid arguments for create widget', arguments);
                 var Widget = definitionsMap[name];
                 if (!Widget) {
                     return console.error('Unknown widget: ' + name);

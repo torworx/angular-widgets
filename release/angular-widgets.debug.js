@@ -2,7 +2,7 @@
 * angular-widgets JavaScript Library
 * Authors: https://github.com/torworx/angular-widgets/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 2013-11-04 11:17
+* Compiled At: 2013-11-05 15:43
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -372,6 +372,7 @@ function $WidgetsProvider() {
             }
 
             WidgetClass.call(this, data);
+            this.widgetName = name;
             return this;
         };
 
@@ -484,6 +485,11 @@ function $WidgetsProvider() {
             ready: promise,
             definitions: definitions,
             widget: function (name, data) {
+                if (!data) {
+                    data = name;
+                    name = data.widgetName;
+                }
+                if (!name) throw new Error('Invalid arguments for create widget', arguments);
                 var Widget = definitionsMap[name];
                 if (!Widget) {
                     return console.error('Unknown widget: ' + name);
