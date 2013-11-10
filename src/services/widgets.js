@@ -1,12 +1,15 @@
 function $WidgetsProvider() {
 
     var debugWidgets = debug('ngw:widgets-service');
+    var self = this;
     var service = {},
         queue = [],
         definitions = [],
         definitionsMap = {};
 
-    this.WidgetClass = WidgetClass;
+    self.WidgetClass = WidgetClass;
+
+    self.$widgetInjects = [];
 
     function declare(name, settings, properties) {
         if (!properties) {
@@ -28,12 +31,31 @@ function $WidgetsProvider() {
         extend(NewClass, WidgetClass, {widgetName: name});
         extend(NewClass.prototype, WidgetClass.prototype, properties);
 
+        inject(NewClass.prototype, self.$widgetInjects);
+
         if (settings) {
             NewClass.settings = settings;
             NewClass.prototype.settings = settings;
         }
 
         return NewClass;
+    }
+
+    function inject(object, names) {
+        if (!isArray(names)) names = [];
+        var $injector = angular.injector();
+        _.forEach(names, function (name) {
+            if (isString(name)) {
+                Object.defineProperty(object, name, {
+                    get: function () {
+                        return $injector.get(name);
+                    },
+                    set: function (valur) {},
+                    enumerable: false,
+                    configurable: true
+                });
+            }
+        });
     }
 
     this.define = define;
