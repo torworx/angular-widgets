@@ -31,31 +31,12 @@ function $WidgetsProvider() {
         extend(NewClass, WidgetClass, {widgetName: name});
         extend(NewClass.prototype, WidgetClass.prototype, properties);
 
-        inject(NewClass.prototype, self.$widgetInjects);
-
         if (settings) {
             NewClass.settings = settings;
             NewClass.prototype.settings = settings;
         }
 
         return NewClass;
-    }
-
-    function inject(object, names) {
-        if (!isArray(names)) names = [];
-        var $injector = angular.injector();
-        _.forEach(names, function (name) {
-            if (isString(name)) {
-                Object.defineProperty(object, name, {
-                    get: function () {
-                        return $injector.get(name);
-                    },
-                    set: function (valur) {},
-                    enumerable: false,
-                    configurable: true
-                });
-            }
-        });
     }
 
     this.define = define;
@@ -137,8 +118,8 @@ function $WidgetsProvider() {
     };
 
     this.$get = $get;
-    $get.$inject = ['$q', '$http'];
-    function $get($q, $http) {
+    $get.$inject = ['$injector', '$q', '$http'];
+    function $get($injector, $q, $http) {
         var resources = new Resources($q, $http);
 
         var promise = flush($q, $http).then(function (results) {
@@ -164,7 +145,9 @@ function $WidgetsProvider() {
                 if (!Widget) {
                     return console.error('Unknown widget: ' + name);
                 }
-                return new Widget(data);
+                var widget = new Widget(data);
+                inject(widget, self.$widgetInjects);
+                return widget;
             },
             loadResources: function (widgets) {
                 if (!isArray(widgets)) widgets = [widgets];
@@ -179,6 +162,22 @@ function $WidgetsProvider() {
             pack: pack,
             unpack: unpack
         });
+
+        function inject(object, names) {
+            if (!isArray(names)) names = [];
+            _.forEach(names, function (name) {
+                if (isString(name)) {
+                    Object.defineProperty(object, name, {
+                        get: function () {
+                            return $injector.get(name);
+                        },
+                        set: function (valur) {},
+                        enumerable: false,
+                        configurable: true
+                    });
+                }
+            });
+        }
 
         return service;
     }

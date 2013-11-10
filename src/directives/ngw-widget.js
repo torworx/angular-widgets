@@ -35,8 +35,7 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $compile, $timeout) 
             $scope.run = function () {
                 widget.run({
                     scope: $scope,
-                    element: $elBody,
-                    $timeout: $timeout
+                    element: $elBody
                 });
             };
 
