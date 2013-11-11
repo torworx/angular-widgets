@@ -1,6 +1,6 @@
 {
   "name": "angular-widgets",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A widgets framework for AngularJS",
   "main": "angular-widgets.js",
   "scripts": {
