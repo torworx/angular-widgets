@@ -166,18 +166,22 @@ app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $http, $mod
 
     $scope.loadWidgets = function () {
         // load widgets
-        var widgets = storage.loadWidgets() || (function () {
-            var results = [];
+        var widgets = storage.loadWidgets();
+        if (widgets) {
+            widgets = _.map(widgets, function (widget) {
+                return $widgets.widget(widget);
+            });
+        } else {
+            widgets = [];
             angular.forEach(getSampleDevices(), function (device, guid) {
                 var devices = {};
                 devices[guid] = device;
-                results.push($widgets.widget(device.deviceType, {
+                widgets.push($widgets.widget(device.deviceType, {
                     devices: devices
                 }));
             });
-            storage.saveWidgets(results);
-            return results;
-        })();
+            storage.saveWidgets(widgets);
+        }
 
         // load widgets resources
         $widgets.loadResources(widgets).then(function () {
