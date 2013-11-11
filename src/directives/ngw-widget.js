@@ -11,13 +11,16 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $compile, $timeout) 
             var $elBody = element.find('.x-widget-body');
 
             var widget = $scope.widget;
+
+            _.extend($scope, $scope.$parent.defaults);
+
             $scope.style = $sce.trustAsHtml(widget.style);
 
             $el.attr('id', widget.id);
-            $el.width(widget.width);
-            $el.height(widget.height);
-            if (widget.bodyCls) {
-                $elBody.addClass(widget.bodyCls);
+            $el.width($scope.width);
+            $el.height($scope.height);
+            if ($scope.bodyCls) {
+                $elBody.addClass($scope.bodyCls);
             }
 
             $scope.updateBodyHTML = function () {

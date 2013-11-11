@@ -11,12 +11,12 @@ function $WidgetsDirective($rootScope, $templateCache, $timeout) {
             var options = $scope.$eval(attrs.ngwWidgets);
             if (!options) return;
 
-            var defaults = extend({
+            $scope.defaults = extend({
                 width: 250,
                 height: 210,
                 cls: 'x-panel-default',
                 selectedCls: 'x-panel-selected'
-            }, options.defaults || {});
+            }, options.defaults);
 
             if (typeof options.widgets === 'string') {
                 $scope.$parent.$watch(options.widgets, function (widgets) {
@@ -28,11 +28,6 @@ function $WidgetsDirective($rootScope, $templateCache, $timeout) {
 
             function update(widgets) {
                 $scope.widgets = widgets;
-                angular.forEach(widgets, function (widget) {
-                    merge(widget, defaults);
-                    extend(widget, options.widget);
-                });
-
                 $timeout(function () {
                     $rootScope.$broadcast(':widgetsLoaded', $scope.widgets);
                 });
@@ -45,7 +40,6 @@ function $WidgetsDirective($rootScope, $templateCache, $timeout) {
 
             $scope.deleteWidget = function (widget) {
                 debugWidgetsDirective('deleting widget #' + widget.id);
-//                var _widget = copy(widget);
                 $scope.widgets.splice($scope.widgets.indexOf(widget), 1);
                 $rootScope.$broadcast(':widgetDeleted', widget, $scope.widgets);
                 $timeout(function () {

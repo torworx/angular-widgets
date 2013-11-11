@@ -91,6 +91,8 @@ app.config(function ($widgetsProvider) {
 
     $widgetsProvider.load('temperature', 'widgets/temperature');
     $widgetsProvider.load('rgbled', 'widgets/rgbled');
+
+    $widgetsProvider.$widgetInjects = ['$timeout'];
 });
 
 app.service('storage', function ($widgets) {
@@ -144,8 +146,6 @@ app.controller('MyCtrl', function ($rootScope, $scope, $q, $timeout, $http, $mod
         widgets: 'widgets',
         defaults: {
 //            selectedCls: 'panel-primary'
-        },
-        widget: {
             tools: [
                 {
                     iconCls: 'glyphicon glyphicon-cog',

@@ -2,7 +2,7 @@
 * angular-widgets JavaScript Library
 * Authors: https://github.com/torworx/angular-widgets/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 2013-11-10 21:33
+* Compiled At: 2013-11-11 16:59
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -728,13 +728,16 @@ function $WidgetDirective($rootScope, $templateCache, $sce, $compile, $timeout) 
             var $elBody = element.find('.x-widget-body');
 
             var widget = $scope.widget;
+
+            _.extend($scope, $scope.$parent.defaults);
+
             $scope.style = $sce.trustAsHtml(widget.style);
 
             $el.attr('id', widget.id);
-            $el.width(widget.width);
-            $el.height(widget.height);
-            if (widget.bodyCls) {
-                $elBody.addClass(widget.bodyCls);
+            $el.width($scope.width);
+            $el.height($scope.height);
+            if ($scope.bodyCls) {
+                $elBody.addClass($scope.bodyCls);
             }
 
             $scope.updateBodyHTML = function () {
@@ -799,12 +802,12 @@ function $WidgetsDirective($rootScope, $templateCache, $timeout) {
             var options = $scope.$eval(attrs.ngwWidgets);
             if (!options) return;
 
-            var defaults = extend({
+            $scope.defaults = extend({
                 width: 250,
                 height: 210,
                 cls: 'x-panel-default',
                 selectedCls: 'x-panel-selected'
-            }, options.defaults || {});
+            }, options.defaults);
 
             if (typeof options.widgets === 'string') {
                 $scope.$parent.$watch(options.widgets, function (widgets) {
@@ -816,11 +819,6 @@ function $WidgetsDirective($rootScope, $templateCache, $timeout) {
 
             function update(widgets) {
                 $scope.widgets = widgets;
-                angular.forEach(widgets, function (widget) {
-                    merge(widget, defaults);
-                    extend(widget, options.widget);
-                });
-
                 $timeout(function () {
                     $rootScope.$broadcast(':widgetsLoaded', $scope.widgets);
                 });
@@ -832,7 +830,6 @@ function $WidgetsDirective($rootScope, $templateCache, $timeout) {
 
             $scope.deleteWidget = function (widget) {
                 debugWidgetsDirective('deleting widget #' + widget.id);
-
                 $scope.widgets.splice($scope.widgets.indexOf(widget), 1);
                 $rootScope.$broadcast(':widgetDeleted', widget, $scope.widgets);
                 $timeout(function () {
@@ -847,14 +844,14 @@ angular.module('ng.widgets.directives').directive('ngwWidgets', $WidgetsDirectiv
 angular.module("ng.widgets").run(["$templateCache", function($templateCache) {
 
   $templateCache.put("widget.html",
-    "<div class=\"x-panel\" ng-class=\"selected ? widget.selectedCls : widget.cls\">\n" +
+    "<div class=\"x-panel\" ng-class=\"selected ? selectedCls : cls\">\n" +
     "    <div class=\"x-widget-header x-panel-header drag-handle\" ng-click=\"selectWidget(widget)\">\n" +
     "        <h1>{{widget.settings.name}}</h1>\n" +
     "        <div class=\"x-tools x-pull-right\">\n" +
     "            <span class=\"x-tool\"\n" +
     "                  ng-class=\"tool.iconCls || ''\"\n" +
     "                  ng-click=\"toolOnClick(tool, $event)\"\n" +
-    "                  ng-repeat=\"tool in widget.tools\">\n" +
+    "                  ng-repeat=\"tool in tools\">\n" +
     "            </span>\n" +
     "\n" +
     "        </div>\n" +
