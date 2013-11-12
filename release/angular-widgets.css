@@ -7,7 +7,7 @@ body{color:#666}
 .x-widgets-container .x-panel{border:1px solid;}
 .x-widgets-container .x-panel .x-panel-header{padding:0 !important;margin:-1px -1px -1px;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}
 .x-widgets-container .x-panel-default{border-color:#ccc;-webkit-border-radius:2px;border-radius:2px;}
-.x-widgets-container .x-panel-default > .x-panel-header{color:#888;background-color:#eee;border:1px;border-style:solid;border-color:#ccc;border-top-left-radius:2px;border-top-right-radius:2px;}
+.x-widgets-container .x-panel-default > .x-panel-header{color:#888;background-color:rgba(255,255,255,0.7);border:1px;border-style:solid;border-color:#ccc;border-top-left-radius:2px;border-top-right-radius:2px;}
 .x-widgets-container .x-panel-default > .x-panel-header + .x-panel-collapse .x-panel-body{border-top-color:#ccc}
 .x-widgets-container .x-panel-default > .x-panel-header > .dropdown .caret{border-color:#888 transparent}
 .x-widgets-container .x-panel-default > .x-panel-footer + .x-panel-collapse .x-panel-body{border-bottom-color:#ccc}
