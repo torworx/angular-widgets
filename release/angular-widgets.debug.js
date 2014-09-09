@@ -2,7 +2,7 @@
 * angular-widgets JavaScript Library
 * Authors: https://github.com/torworx/angular-widgets/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 2013-11-12 10:51
+* Compiled At: 2014-09-09 15:00
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -946,6 +946,7 @@ angular.module("ng.widgets").run(["$templateCache", function($templateCache) {
   $templateCache.put("widget.html",
     "<div class=\"x-panel\" ng-class=\"selected ? selectedCls : cls\">\n" +
     "    <div class=\"x-widget-header x-panel-header drag-handle\" ng-click=\"selectWidget(widget)\">\n" +
+    "        <img src=\"/widgets/{{widget.widgetName}}/images/{{widget.settings.icon}}\" class=\"x-widget-header-icon\">\n" +
     "        <h1>{{widget.settings.name}}</h1>\n" +
     "        <div class=\"x-tools x-pull-right\">\n" +
     "            <span class=\"x-tool\"\n" +

@@ -1,5 +1,6 @@
 <div class="x-panel" ng-class="selected ? selectedCls : cls">
     <div class="x-widget-header x-panel-header drag-handle" ng-click="selectWidget(widget)">
+        <img src="/widgets/{{widget.widgetName}}/images/{{widget.settings.icon}}" class="x-widget-header-icon">
         <h1>{{widget.settings.name}}</h1>
         <div class="x-tools x-pull-right">
             <span class="x-tool"
