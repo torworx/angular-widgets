@@ -7,7 +7,7 @@ function $SizableDirective($rootScope) {
             var $el = $(element);
             var baseWidth = $el.width();
             var baseHeight = $el.height();
-            var gutter = 20;
+            var gutter = 15;
 
             scope.$watch('widget.settings.sizeX', function (newX, oldX) {
                 element.width(baseWidth * newX + (gutter * (newX - 1)));

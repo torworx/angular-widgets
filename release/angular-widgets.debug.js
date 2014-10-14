@@ -2,7 +2,7 @@
 * angular-widgets JavaScript Library
 * Authors: https://github.com/torworx/angular-widgets/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 2014-09-25 17:15
+* Compiled At: 2014-10-14 12:45
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -642,7 +642,7 @@ function $PackeryDirective($rootScope, $timeout) {
                     itemSelector: attrs.ngwPackery,
                     columnWidth: 250,
                     rowHeight: 210,
-                    gutter: 20,
+                    gutter: 15,
                     isInitLayout: false
                 });
 
@@ -795,7 +795,7 @@ function $SizableDirective($rootScope) {
             var $el = $(element);
             var baseWidth = $el.width();
             var baseHeight = $el.height();
-            var gutter = 20;
+            var gutter = 15;
 
             scope.$watch('widget.settings.sizeX', function (newX, oldX) {
                 element.width(baseWidth * newX + (gutter * (newX - 1)));

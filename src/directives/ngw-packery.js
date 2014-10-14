@@ -14,7 +14,7 @@ function $PackeryDirective($rootScope, $timeout) {
                     itemSelector: attrs.ngwPackery,
                     columnWidth: 250,
                     rowHeight: 210,
-                    gutter: 20,
+                    gutter: 15,
                     isInitLayout: false
                 });
 
